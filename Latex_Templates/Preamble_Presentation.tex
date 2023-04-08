@@ -1,0 +1,77 @@
+
+\documentclass{beamer}
+% alternatives: scrartcl, article or report
+
+
+\usetheme{default}
+\usecolortheme{default}
+\usefonttheme[onlymath]{serif}
+
+\input{../Latex_Templates/Declare_Mathops.tex}
+
+%%%%%%% GENERAL STYLE %%%%%%%%%%%%%%%%%%
+%
+%\setcounter{tocdepth}{3}
+%\setcounter{secnumdepth}{0}
+
+
+% modify beamer template
+\setbeamercolor{footline}{fg=blue}
+\setbeamerfont{footline}{size={\fontsize{10}{12}}}
+\setbeamertemplate{navigation symbols}{}
+
+%\setbeamertemplate{navigation symbols}{%
+%    \usebeamerfont{footline}%
+%    \usebeamercolor[fg]{footline}%
+%    \hspace{1em}%
+%    \raisebox{4pt}[0pt][0pt]{\insertframenumber/\inserttotalframenumber}
+%}
+
+%\setbeamertemplate{footline}{
+%	\vspace*{0.1cm}
+%	\hspace*{0.01cm}
+%	\insertsection
+%	\hfill\insertframenumber/\inserttotalframenumber
+%	\hspace*{0.1cm}
+%}
+
+\setbeamertemplate{footline}[page number]
+
+% modify handling of bibliography
+\setbeamertemplate{bibliography entry title}{}
+\setbeamertemplate{bibliography entry location}{}
+\setbeamertemplate{bibliography entry note}{}
+
+\setbeamertemplate{bibliography item}[text]
+
+
+%%%%% allow for proofs over multiple slides
+
+\makeatletter
+\newenvironment<>{proofs}[1][\proofname]{%
+    \par
+    \def\insertproofname{#1\@addpunct{.}}%
+    \usebeamertemplate{proof begin}#2}
+  {\usebeamertemplate{proof end}}
+\makeatother
+
+%%%%%% TITLE PAGE
+%
+%\subject{Specialised Course in Integration Theory, VT23}
+%\title{Assignment Chapter 3.5}
+%\author{Theo Koppenhöfer}
+%\date{\today}
+%
+%
+%%%%%% The content starts here %%%%%%%%%%%%%
+%
+%
+%\begin{document}
+%
+%\maketitle
+%
+%
+%%\nocite{*}
+%\printbibliography
+%
+%\end{document}

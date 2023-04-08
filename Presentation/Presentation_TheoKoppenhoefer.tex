@@ -1,0 +1,365 @@
+%
+
+\input{../Latex_Templates/Preamble_Presentation}
+
+%%%%% TITLE PAGE
+
+\subject{, VT23}
+\title{%Junzi Zhang, Brendan O'Donoghue, Stephen Boyd: 
+Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iterations}
+%\subtitle{}
+\author{Theo Koppenhöfer}
+\date{Lund \\[1ex] \today}
+
+
+%\SetAlFnt{\small}
+\addbibresource{bibliography.bib}
+
+
+
+\begin{document}
+
+\frame[plain]
+
+
+
+% Frame 2
+\frame[plain]{\titlepage}
+
+% Frame 3
+\frame[plain]{ \frametitle{Table of contents} \tableofcontents }
+
+\section{An introductory example}
+\begin{frame}
+
+\end{frame}
+
+\section{AA-II}
+\subsection{AA-II}
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{General AA}\label{alg:cap}
+	\SetKwInOut{Input}{Input}
+	
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$}
+	\BlankLine
+	\For{$k=0,1,\dots$}{
+	  Choose $m_k\in\{0,\dots,k\}$\;
+	  Choose $\alpha^k\in \R^{m_k}$ such that $\sum_i\alpha_i^k=1$\;
+	  $f_k =f\brk*{x_k}$
+	  $x_{k+1} = \sum_i \alpha_i^kf_{k-m_k+i}$\;
+	}
+	\end{algorithm}
+\end{frame}
+
+
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{General AA}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$}
+	\BlankLine
+	\For{$k=0,1,\dots$}{
+	  Choose $m_k\in\{0,\dots,k\}$\;
+	  Choose $\alpha^k\in \R^{m_k}$ such that $\sum_i\alpha_i^k=1$ {\color{black} and such that $\alpha$ minimises $\norm{\sum_i\alpha^k_ig^i}_2$}\;
+	  $f_k =f\brk*{x_k}$\;
+	  $x_{k+1} = \sum_i \alpha_i^kf_{k-m_k+i}$\;
+	}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\frametitle{AA-II}
+	Define residual $g=\Id-f\colon\R^n\to\R^n$ and $g_k = g(x_k)$.
+	Choose $\alpha\in\R^{m_k}$ such that it minimises
+	\begin{align*}
+		\norm{\sum_i\alpha^k_ig_i}_2
+	\end{align*}
+	and
+	\begin{align*}
+		\sum_i\alpha^k_i = 1\,.
+	\end{align*}
+	It can be shown that then
+	\begin{align*}
+		x_{k+1} = \sum_i \alpha_i^kf\brk*{x_{k-m_k+i}} = x_k-H_kg_k
+	\end{align*}
+	for some $H_k\in\R^{n\times m_k}$ such that $H_k$ minimises $\norm{H_k-\Id}_F$.
+\end{frame}
+
+
+\subsection{AA-I}
+\begin{frame}
+	\frametitle{AA-I}
+\end{frame}
+
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-I}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x^0\in\R^n$ and $f\colon\R^n\to\R^n$}
+	\BlankLine
+	Set $H_0=\Id$, $x_1=f\brk{x_0}$.
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_{k})$,
+		$s_{k-1}= x_k-x_{k-1}$ and
+		$y_{k-1}= g_k-g_{k-1}$.
+		
+		Set $\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}y_{k-1})s_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}y_{k-1}}$ and $x_{k+1}= x_k-H_kg_k$.
+		
+	}
+	\end{algorithm}
+\end{frame}
+
+\section{Modifications to AA-I}
+\subsection{Powell-type regularisation}
+
+\begin{frame}	
+	\frametitle{Powell-type regularisation}
+	Note that $B_k$ may be singular. To solve this set
+	\begin{align*}
+		\tiy_k=\theta_ky_k+(1-\theta_k)B_ks_k
+	\end{align*}
+	where
+	\begin{align*}
+		\theta_k = \phi_{\bartheta}(\eta_k)
+	\end{align*}
+	and
+	\begin{align*}
+		\phi_{\bartheta}(\eta) = \begin{cases}
+			\frac{1-\sgn(\eta)\bartheta}{1-\eta} &\text{ if }\abs{\eta}<\bartheta \\
+			1 &\text{ else }
+		\end{cases} \qquad
+		\eta_k = \frac{\hs_k^\top H_ky_k}{\norm{\hs_k}^2}
+	\end{align*}
+\end{frame}
+
+\begin{frame}
+	One can obtain
+	\begin{lemma}[Powell-type regularisation]
+		Let $s_k\in\R^n$, $B_0=\Id$, and inductively
+		\begin{align*}
+			B_{k+1} = B_k+\frac{\brk{\tiy_k-B_ks_k}\hs_k^\top}{\hs_k^\top s_k}
+		\end{align*}
+		with $\hs_k$ and $\tiy_k$ defined as before. If this is well-defined then $\abs{\det\brk{B_k}}\geq \theta^k>0$ and $B_k$ is invertible.
+	\end{lemma}
+	\begin{proof}
+		See \cite[Lemma 2]{ZhaAA}.
+	\end{proof}
+\end{frame}
+
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-I with Powell-like-regularisation}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$}
+	\BlankLine
+	Set $H_0=\Id$, $x_1=f\brk{x_0}$.
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_{k})$,
+		$s_{k-1}= x_k-x_{k-1}$ and
+		$y_{k-1}= g_k-g_{k-1}$.
+		
+		Set $\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		
+		{\black
+		Set $\eta_{k-1}= \frac{\hs_{k-1}^\top H_{k-1}y_{k-1}}{\norm{\hs_{k-1}}^2}$, 
+		$\theta_{k-1}=\phi_{\bartheta}(\eta_{k-1})$
+		and $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		}
+		
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $x_{k+1}= x_k-H_kg_k$.
+		
+	}
+	\end{algorithm}
+\end{frame}
+
+\subsection{Restarting iteration}
+\begin{frame}
+	\frametitle{Restarting iteration}
+	Note that
+	\begin{align*}
+		B_{k+1} = B_k+\frac{\brk{\tiy_k-B_ks_k}\hs_k^\top}{\hs_k^\top s_k}
+	\end{align*}
+	is ill-defined iff $\norm{\hs_k}^2=\hs_k^\top s_k=0$, i.e.\ $\hs_k=0$. This can occur for $m_k>n$ as we then have $\hs_k=0$ by linear dependence.
+	If we reset $m_k=0$ if $m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$ for some $\tau\in(0,1)$
+	then 
+	$$g_k\neq 0 \implies s_k=-B_kg_k\neq 0\implies \hs_k\neq 0\,.$$
+\end{frame}
+
+\begin{frame}
+	\begin{lemma}[Restarting iteration]
+		If we additionally choose $m_k$ by the rule above we have
+		\begin{align*}
+			\norm{B_k}\leq 3\brk*{\frac{1+\bartheta+\tau}{\tau}}^m-2\,.
+		\end{align*}
+	\end{lemma}
+	\begin{proof}
+		See \cite[Lemma 3]{ZhaAA}.
+	\end{proof}
+\end{frame}
+
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-I with Powell-like-regularisation and Restarting}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\color{black}$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
+	\BlankLine
+	Set $H_0=\Id$, $x_1=f\brk{x_0}$, $m_0 = 0$.
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_{k})$,
+		$m_k= m_{k-1}+1$, 
+		$s_{k-1}= x_k-x_{k-1}$ and
+		$y_{k-1}= g_k-g_{k-1}$.
+		
+		Set $\hs_{k-1}= s_{k-1}-\sum_{i=k-m_k}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		
+		{\black
+		\If{$m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$}{
+			Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $H_{k-1}=\Id$.
+		}
+		}
+		Set $\eta_{k-1}= \frac{\hs_{k-1}^\top H_{k-1}y_{k-1}}{\norm{\hs_{k-1}}^2}$, 
+		$\theta_{k-1}=\phi_{\bartheta}(\eta_{k-1})$
+		and $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $x_{k+1}= x_k-H_kg_k$.
+		
+	}
+	\end{algorithm}
+\end{frame}
+
+
+\subsection{Safeguarding steps}
+\begin{frame}
+	\frametitle{Safeguarding steps}
+	To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnoselskii-Mann steps which are given by
+	\begin{align*}
+		x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)
+	\end{align*}
+	for some fixed $\alpha\in(0,1)$.
+\end{frame}
+
+\SetAlFnt{\footnotesize}
+
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-I with Powell-like-regularisation, Restarting and Safeguarding}\label{alg:aa1-prs}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$,$m \in\N$, $\bartheta, \tau, {\color{black}\alpha}\in(0,1)$, {\color{black}safe-guarding constants $D,\e>0$}}
+	\BlankLine
+	Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\color{black}n_{AA}=0}$ and ${\color{black}\barU=\norm{g_0}_2}$.
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_{k})$,
+		$m_k= m_{k-1}+1$, 
+		$s_{k-1}= {\black\tix_k}-x_{k-1}$ and
+		$y_{k-1}= g({\black\tix_k})-g_{k-1}$.
+		
+		Set $\hs_{k-1}= s_{k-1}-\sum_{i=k-m_k}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		
+		\If{$m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$}{
+			Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $H_{k-1}=\Id$.
+		}
+		Set $\eta_{k-1}= \frac{\hs_{k-1}^\top H_{k-1}y_{k-1}}{\norm{\hs_{k-1}}^2}$, 
+		$\theta_{k-1}=\phi_{\bartheta}(\eta_{k-1})$
+		and $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $\tix_{k+1}= x_k-H_kg_k$.
+		
+		{\color{black}
+		\uIf{$\norm{g_k}\leq D\barU(n_{AA}+1)^{-(1+\e)}$}{
+			Set $x_{k+1}=\tix_{k+1}$ and $n_{AA}= n_{AA}+1$.
+		}
+		\Else{
+			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$
+		}
+		}
+	}
+	\end{algorithm}
+\end{frame}
+
+\section{Convergence result}
+
+\begin{frame}
+	\frametitle{Convergence result}
+	\begin{theorem}[Convergence]
+		Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k\xrightarrow{k\to\infty}x_*$ and $f(x_*)=x_*$ is a fixed point.
+	\end{theorem}
+\end{frame}
+
+
+\section{Numerical experiments}
+
+\subsection{Regularised logistic regression}
+
+\begin{frame}
+	\frametitle{Regularised logistic regression}
+	We take $x\in\R^{2000\times 500}=, y\in\R^{2000}$ with  from the UCI Madelon dataset. The aim is to minimise
+	\begin{align*}
+		F(\theta) = \frac{1}{2000}\sum_{i}\log\brk{1+\sum_jy_ix_{ij}\theta_j}+\frac{\lambda}{2}\norm{\theta}^2
+	\end{align*}
+	with gradient descent, i.e.\
+	\begin{align*}
+		f(\theta) = \theta-\alpha\nabla F(\theta)
+	\end{align*}
+	for some $\alpha\in(0,2/L)$.
+\end{frame}
+
+\begin{frame}
+	\begin{figure}
+		\centering
+		\input{../Plots/norm_gk_GD.pgf}
+		\caption{Residual norms for the logistic regression problem.}
+	\end{figure}
+\end{frame}
+
+\subsection*{Facility location}
+
+\begin{frame}
+	
+\end{frame}
+
+\begin{frame}
+	\begin{figure}
+		\centering
+		\input{../Plots/norm_gk_CO.pgf}
+		\caption{Residual norms for the facility location problem.}
+	\end{figure}
+\end{frame}
+
+\section{Sources}
+
+\begin{frame}[allowframebreaks]
+	\frametitle{Sources}
+	\nocite{*}
+%	\bibliographystyle{plain}
+%	\bibliography{bibliography}
+	\printbibliography
+\end{frame}
+
+
+\begin{frame}[plain]
+	\begin{center}
+		\Large{{Thank you for your attention.}}
+	\end{center}
+\end{frame}
+
+\frame[plain]
+
+\end{document}

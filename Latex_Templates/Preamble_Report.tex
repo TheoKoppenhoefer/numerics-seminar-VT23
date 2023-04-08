@@ -1,0 +1,45 @@
+
+\documentclass{report}
+% alternatives: scrartcl, article or report
+
+
+%%%%% PACKAGES
+
+\input{../Latex_Templates/Declare_Mathops}
+
+
+% theorem-like environments
+\newcounter{everything}
+\newtheorem{corollary}[everything]{Corollary}
+\newtheorem{lemma}[everything]{Lemma}
+\newtheorem{proposition}[everything]{Proposition}
+\newtheorem{theorem}[everything]{Theorem}
+\newtheorem*{claim}{Claim}
+\newtheorem*{given}{Given}
+
+%%%%%%% GENERAL STYLE %%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{0}
+
+
+%%%%%% TITLE PAGE
+%
+%\subject{Specialised Course in Integration Theory, VT23}
+%\title{Assignment Chapter 3.5}
+%\author{Theo Koppenhöfer}
+%\date{\today}
+%
+%
+%%%%%% The content starts here %%%%%%%%%%%%%
+%
+%
+%\begin{document}
+%
+%\maketitle
+%
+%
+%%\nocite{*}
+%\printbibliography
+%
+%\end{document}

@@ -1,0 +1,314 @@
+
+
+%%%%% PACKAGES
+
+% small tweaks and nicer typography
+\usepackage{microtype}
+\usepackage{hyperref}
+
+% changes language to German
+% gives proper date, and correct hyphenation
+%\usepackage[ngerman]{babel}
+%\uselanguage{German}
+%\languagepath{German}
+
+% basic math stuff
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{amsthm}
+%\usepackage{tikz-cd}
+\usepackage{cancel}
+\usepackage{cases}
+\usepackage{dsfont}
+\usepackage{delimset} % for nice delimiters
+\usepackage{centernot}
+
+
+% tikz
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{positioning}
+%\usetikzlibrary{patterns}
+%\usetikzlibrary{babel}
+\tikzset{>=stealth}
+\usepackage{wrapfig}
+
+% Plotting
+\usepackage{pgfplots}
+
+% code
+%\usepackage{listings}
+%\usepackage{pythonhighlight}
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+\usepackage{algorithm2e}
+\RestyleAlgo{algoruled}
+
+\usepackage[backend=bibtex, style=ieee]{biblatex}
+%\usepackage{biblatex}
+%\addbibresource{mybib.bib}
+
+% dealing with figures
+%\usepackage[figurename=Abb.]{caption}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+
+% display quotes correctly
+\usepackage{csquotes}
+
+% allow for any font-size, alternative mathpazo
+\usepackage{mathptmx}
+
+% color
+\usepackage{xcolor}
+
+%%%% Graphics %%%%%
+
+%\graphicspath{{Plots/}}
+
+%\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [anchor=base,#1](#2) {$#3$};}
+
+%\usepackage{booktabs}
+%\usepackage{bm}
+%\usepackage{minted}
+
+% for inkscape images
+%\usepackage{pdftricks}
+%\begin{psinputs}
+%   \usepackage{pstricks}
+%   \usepackage{multido}
+%\end{psinputs}
+%\usepackage[pdf]{pstricks}
+%\usepackage{import}
+
+
+
+% images
+\usepackage{graphicx}
+\graphicspath{ {./Plots} }
+
+% tikz
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{babel}
+\tikzset{>=stealth}
+\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [anchor=base,#1](#2) {$#3$};}
+
+
+% Tikz librarys
+\usetikzlibrary{datavisualization}
+\usetikzlibrary{datavisualization.formats.functions}
+%\usetikzlibrary{external}
+%\tikzexternalize[prefix=../Resources/]
+
+
+
+%%%%% CONFIGURATION
+
+% prevents automatic line breaks inside of equations
+% since it looks bad
+\binoppenalty = \maxdimen
+\relpenalty   = \maxdimen
+
+
+%%%%%% PGFPLOTS %%%%%%%%%%%
+
+%\usepgfplotslibrary{grouplots}
+\usepgfplotslibrary{dateplot}
+
+
+%%%%% CUSTOM COMMANDS
+
+% real numbers via \R
+% complex numbers via \C
+% general field via \K
+\def\C{\mathbb{C}}
+\def\R{\mathbb{R}}
+\def\K{\mathbb{K}}
+\def\F{\mathbb{F}}
+\def\Q{\mathbb{Q}}
+\def\Z{\mathbb{Z}}
+\def\N{\mathbb{N}}
+\def\H{\mathbb{H}}
+\def\e{\varepsilon}
+
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cZ}{\mathcal{Z}}
+
+\newcommand{\bA}{\mathbb{A}}
+\newcommand{\bB}{\mathbb{B}}
+\newcommand{\bC}{\mathbb{C}}
+\newcommand{\bD}{\mathbb{D}}
+\newcommand{\bE}{\mathbb{E}}
+\newcommand{\bF}{\mathbb{F}}
+\newcommand{\bG}{\mathbb{G}}
+\newcommand{\bH}{\mathbb{H}}
+\newcommand{\bI}{\mathbb{I}}
+\newcommand{\bJ}{\mathbb{J}}
+\newcommand{\bK}{\mathbb{K}}
+\newcommand{\bL}{\mathbb{L}}
+\newcommand{\bM}{\mathbb{M}}
+\newcommand{\bN}{\mathbb{N}}
+\newcommand{\bO}{\mathbb{O}}
+\newcommand{\bP}{\mathbb{P}}
+\newcommand{\bQ}{\mathbb{Q}}
+\newcommand{\bR}{\mathbb{R}}
+\newcommand{\bS}{\mathbb{S}}
+\newcommand{\bT}{\mathbb{T}}
+\newcommand{\bU}{\mathbb{U}}
+\newcommand{\bV}{\mathbb{V}}
+\newcommand{\bW}{\mathbb{W}}
+\newcommand{\bX}{\mathbb{X}}
+\newcommand{\bY}{\mathbb{Y}}
+\newcommand{\bZ}{\mathbb{Z}}
+
+
+
+\newcommand{\hu}{\hat{u}}
+\newcommand{\hv}{\hat{v}}
+\newcommand{\hV}{\hat{V}}
+\newcommand{\hw}{\hat{w}}
+\newcommand{\hW}{\hat{W}}
+\newcommand{\hA}{\hat{A}}
+\newcommand{\hC}{\hat{C}}
+\newcommand{\hR}{\hat{R}}
+\newcommand{\hQ}{\hat{Q}}
+\newcommand{\hq}{\hat{q}}
+\newcommand{\hp}{\hat{p}}
+\newcommand{\hl}{\hat{\ell}}
+\newcommand{\hlambda}{\hat{\lambda}}
+\newcommand{\ha}{\hat{a}}
+\newcommand{\hb}{\hat{b}}
+\newcommand{\hs}{\hat{s}}
+
+
+\newcommand{\tiS}{\tilde{S}}
+\newcommand{\tiu}{\tilde{u}}
+\newcommand{\tih}{\tilde{h}}
+\newcommand{\tix}{\tilde{x}}
+\newcommand{\tiy}{\tilde{y}}
+\newcommand{\tis}{\tilde{s}}
+\newcommand{\tie}{\tilde{\e}}
+\newcommand{\tisigma}{\tilde{\sigma}}
+
+
+\newcommand{\bartheta}{\bar{\theta}}
+\newcommand{\barU}{\bar{U}}
+
+
+
+%%%%%%%%%%    Math operators    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\dif}[1]{\,\mathrm{d} #1}
+%\newcommand{\norm}[1]{\lVert #1 \rVert}
+%\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\bnorm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\vii}[2]{\ensuremath{\begin{bmatrix}#1 \\ #2 \end{bmatrix}}}
+\newcommand{\mii}[4]{\ensuremath{\begin{bmatrix}#1&#2 \\ #3&#4 \end{bmatrix}}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+
+\newcommand{\one}{\mathds{1}}
+\newcommand{\bigO}{\mathcal{O}}
+
+
+\DeclareMathOperator{\Image}{Image}
+\DeclareMathOperator{\Vspan}{Span}
+\DeclareMathOperator{\Erf}{erf}
+\DeclareMathOperator{\Id}{Id}             % identity morphism
+% \DeclareMathOperator{\ker}{ker}           % kernel
+\DeclareMathOperator{\rg}{rg}             % image
+\DeclareMathOperator{\defekt}{def}             % defect
+\DeclareMathOperator{\im}{im}             % image
+\DeclareMathOperator{\Hom}{Hom}           % homomorphisms
+\DeclareMathOperator{\End}{End}           % endomorphisms
+\DeclareMathOperator{\Span}{Span}         % linear span
+\DeclareMathOperator{\grad}{\nabla}         % gradient
+\DeclareMathOperator{\diam}{diam}         % gradient
+\DeclareMathOperator{\Tr}{Tr}       	  % trace
+\DeclareMathOperator{\diver}{Div}			% divergence
+\DeclareMathOperator{\supp}{supp}			% support
+\DeclareMathOperator{\dist}{dist}			% distance
+\DeclareMathOperator{\inter}{int}			% interiour
+\DeclareMathOperator{\epi}{epi}			% epigraph
+\DeclareMathOperator{\hyp}{hyp}			% hypograph
+\DeclareMathOperator{\Lip}{Lip}			% lipschitz konstant
+\DeclareMathOperator{\graph}{graph}			% graph
+\DeclareMathOperator{\sgn}{sgn}			% sign
+\DeclareMathOperator{\BMO}{BMO}			% BMO
+\DeclareMathOperator{\mean}{mean}			% BMO
+%\DeclareMathOperator{\B}{B}			% BMO
+
+
+% \vect{ x // y // z } for a column vector with entries x, y, z
+% similarly for larger vectors
+% in this code:  1 = number of arguments
+%               #1 = first argument
+\newcommand{\vect}[1]{\begin{bmatrix} #1 \end{bmatrix}}
+
+% \conj{z} for complex conjugation
+\newcommand{\conj}{\overline}
+
+%counter of current constant number:    
+\newcounter{constant} 
+%defines a new constant, but does not typeset anything:
+\newcommand{\newconstant}[1]{\refstepcounter{constant}\label{#1}} 
+%typesets named constant:
+\newcommand{\useconstant}[1]{c_{\ref{#1}}}
+
+%%%%%%% GENERAL STYLE %%%%%%%%%%%%%%%%%%
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{0}
+
+
+%%%%%%% COLORS %%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\black}{\color{black}}
+
+
+%%%%%% TITLE PAGE
+%
+%\subject{Specialised Course in Integration Theory, VT23}
+%\title{Assignment Chapter 3.5}
+%\author{Theo Koppenhöfer}
+%\date{\today}
+%
+%
+%%%%%% The content starts here %%%%%%%%%%%%%
+%
+%
+%\begin{document}
+%
+%\maketitle
+%
+%
+%%\nocite{*}
+%\printbibliography
+%
+%\end{document}
