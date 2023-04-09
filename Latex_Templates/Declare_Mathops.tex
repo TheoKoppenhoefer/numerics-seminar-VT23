@@ -20,21 +20,9 @@
 \usepackage{cancel}
 \usepackage{cases}
 \usepackage{dsfont}
-\usepackage{delimset} % for nice delimiters
+\usepackage[extdef]{delimset} % for nice delimiters
 \usepackage{centernot}
 
-
-% tikz
-\usepackage{tikz}
-\usepackage{pgfplots}
-\usetikzlibrary{positioning}
-%\usetikzlibrary{patterns}
-%\usetikzlibrary{babel}
-\tikzset{>=stealth}
-\usepackage{wrapfig}
-
-% Plotting
-\usepackage{pgfplots}
 
 % code
 %\usepackage{listings}
@@ -66,8 +54,6 @@
 
 %\graphicspath{{Plots/}}
 
-%\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [anchor=base,#1](#2) {$#3$};}
-
 %\usepackage{booktabs}
 %\usepackage{bm}
 %\usepackage{minted}
@@ -90,16 +76,20 @@
 % tikz
 \usepackage{tikz}
 \usetikzlibrary{positioning}
-\usetikzlibrary{babel}
-\tikzset{>=stealth}
-\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [anchor=base,#1](#2) {$#3$};}
+%\usetikzlibrary{babel}
+\usepackage{pgfplots}
+
 
 
 % Tikz librarys
+%\tikzexternalise
+\usetikzlibrary{external}
+\tikzexternalize[prefix=cache/] % activate and define figureCache/ as cache folder
+%\usetikzlibrary{patterns}
+\tikzset{>=stealth}
+\newcommand{\tikzmark}[3][]{\tikzset{external/export=false}\tikz[remember picture,baseline] \node [anchor=base,#1](#2) {$#3$};}
 \usetikzlibrary{datavisualization}
 \usetikzlibrary{datavisualization.formats.functions}
-%\usetikzlibrary{external}
-%\tikzexternalize[prefix=../Resources/]
 
 
 
@@ -261,6 +251,7 @@
 \DeclareMathOperator{\sgn}{sgn}			% sign
 \DeclareMathOperator{\BMO}{BMO}			% BMO
 \DeclareMathOperator{\mean}{mean}			% BMO
+\DeclareMathOperator{\prox}{prox}
 %\DeclareMathOperator{\B}{B}			% BMO
 
 

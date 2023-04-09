@@ -15,29 +15,29 @@ class fixed_point_schemes():
         self.theta = theta
         self.tau = tau
         self.alpha = alpha
-        # self.H_k = np.eye(n)
         # H = Id + sum_i v_iw_i^T
-        self.v = np.zeros((m,n))
-        self.w = np.zeros_like(self.v)
+        self.vs = np.zeros((m,n))
+        self.ws = np.zeros_like(self.vs)
 
         self.x_km1 = x_0
         self.x_k = f(x_0)
         self.xtilde_km1 = self.x_km1
         self.xtilde_k = self.x_k
-        # self.H_km1 = np.eye(n)
         self.m_k = 0
         self.n_AA = 0
         g_km1 = self.g(self.x_km1)
         self.norm_g_0 = norm(g_km1)
         self.DU = D*self.norm_g_0
-        self.shat_ks = np.zeros_like(self.v)
+        self.shat_ks = np.zeros_like(self.vs)
         self.eps = eps
         self.tol = tol
         self.K_max = int(K_max)
-        if method == 'aa1-prs':
+        if method == 'aa1-safe':
             self.step = self.step_aa1prs
         elif method == 'original':
             self.step = self.step_original
+        elif method == 'aa1':
+            self.step = self.step_aa1
         else:
             raise Exception('Invalid solver given.')
         
@@ -53,8 +53,11 @@ class fixed_point_schemes():
         else:
             print('Did not converge.')
         return norm_g_ks
+    
+    def step_aa1(self):
+        return self.step_aa1prs(*(3*[False]))
 
-    def step_aa1prs(self):
+    def step_aa1prs(self, powell=True, restart=True, safeguard=True):
         self.m_k += 1
         s_km1 = self.xtilde_k-self.x_km1
         g_km1 = self.g(self.x_km1)
@@ -66,39 +69,37 @@ class fixed_point_schemes():
         self.shat_ks[-1,:] = s_km1-self.shat_ks.transpose()@(np.divide(a,b,out=np.zeros_like(a), where=b!=0))
         
         # Restart checking
-        if (self.m_k == self.m+1) or (norm(self.shat_ks[-1,:])<self.tau*norm(s_km1)):
+        if (self.m_k == self.m+1) or (norm(self.shat_ks[-1,:])<self.tau*norm(s_km1)) and restart:
             self.m_k = 0
             self.shat_ks = np.zeros((self.m, self.n))
             self.shat_ks[-1,:] = s_km1
-            self.v = np.zeros_like(self.shat_ks)
-            self.w = np.zeros_like(self.v)
-            # self.H_km1 = np.eye(self.n)
+            self.vs = np.zeros_like(self.shat_ks)
+            self.ws = np.zeros_like(self.vs)
         
         # Powell regularisation
-        # gamma_km1 = self.shat_ks[-1,:].transpose()@self.H_km1@y_km1/(norm(self.shat_ks[-1,:])**2)
-        gamma_km1 = self.shat_ks[-1,:].transpose()@self.eval_H(y_km1)/(norm(self.shat_ks[-1,:])**2)
-        theta_km1 = self.phi(gamma_km1, self.theta)
+        if powell:
+            gamma_km1 = self.shat_ks[-1,:].transpose()@self.eval_H(y_km1)/(norm(self.shat_ks[-1,:])**2)
+            theta_km1 = self.phi(gamma_km1, self.theta)
+            ytilde_km1 = theta_km1*y_km1-(1-theta_km1)*g_km1
+        else:
+            ytilde_km1 = y_km1
 
-        # TODO: check the minus in the following formula
-        ytilde_km1 = theta_km1*y_km1-(1-theta_km1)*g_km1
-        # self.H_km1 += np.tensordot(s_km1-self.H_km1@ytilde_km1, self.shat_ks[-1,:]@self.H_km1, axes=0)/(self.shat_ks[-1,:].transpose()@self.H_km1@ytilde_km1)
         # Update H
         Hytilde_km1 = self.eval_H(ytilde_km1)
-        self.v[:-1,:] = self.v[1:,:]
-        self.v[-1,:] = s_km1-Hytilde_km1
-        self.w[:-1,:] = self.w[1:,:]
-        self.w[-1,:] = 0
-        self.w[-1,:] = self.eval_Ht(self.shat_ks[-1,:])/(self.shat_ks[-1,:].transpose()@Hytilde_km1)
+        self.vs[:-1,:] = self.vs[1:,:]
+        self.vs[-1,:] = s_km1-Hytilde_km1
+        self.ws[:-1,:] = self.ws[1:,:]
+        self.ws[-1,:] = 0
+        self.ws[-1,:] = self.eval_Ht(self.shat_ks[-1,:])/(self.shat_ks[-1,:].transpose()@Hytilde_km1)
         
         self.xtilde_km1 = self.xtilde_k
         g_k = self.g(self.x_k)
-        # self.xtilde_k = self.x_km1-self.H_km1@g_km1
         self.xtilde_k = self.x_k-self.eval_H(g_k)
         self.x_km1 = self.x_k
         norm_g_k = norm(g_k)
 
         # Safeguarding
-        if norm_g_k<=self.DU*(self.n_AA+1)**(-(1+self.eps)):
+        if norm_g_k<=self.DU*(self.n_AA+1)**(-(1+self.eps)) or not safeguard:
             self.x_k = self.xtilde_k
             self.n_AA += 1
         else:
@@ -106,15 +107,14 @@ class fixed_point_schemes():
         return self.x_k, norm_g_k
     
     def eval_H(self, x):
-        return x + self.v.transpose()@(self.w@x)
+        return x + self.vs.transpose()@(self.ws@x)
     
     def eval_Ht(self, x):
-        return x + self.w.transpose()@(self.v@x)
+        return x + self.ws.transpose()@(self.vs@x)
     
 
     def step_original(self):
-        self.x_km1 = self.x_k
-        self.x_k = self.f(self.x_km1)
+        self.x_k = self.f(self.x_k)
         norm_g_k = norm(self.g(self.x_k))
         return self.x_k, norm_g_k
 

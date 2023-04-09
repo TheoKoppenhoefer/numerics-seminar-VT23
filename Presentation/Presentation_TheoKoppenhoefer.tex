@@ -31,7 +31,22 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 
 \section{An introductory example}
 \begin{frame}
-
+	\frametitle{The problem setting}
+	\begin{problem}[find fixed point]
+		Find a fixed point $x\in\R^n$ of $f\colon\R^n\to\R^n$, i.e.\ $x=f(x)$.
+	\end{problem}
+	or equivalently
+	\begin{problem}[find a zero]
+		Find a zero $x\in\R^n$ of $g=\Id-f$, i.e.\ $0=g(x)$.
+	\end{problem}
+	We also assume
+	\begin{itemize}
+		\item $f$ is nonexpansive, i.e.\ $\norm{f(x)-f(y)}\leq\norm{x-y}$
+		\item $n$ is large \textrightarrow matrix-free
+		\item $\nabla f$ is unknown \textrightarrow no Newton
+		\item cost of evaluation of $f$ is high \textrightarrow no line search
+		\item noisy problem \textrightarrow no finite difference derivatives
+	\end{itemize}
 \end{frame}
 
 \section{AA-II}
@@ -129,16 +144,21 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\end{align*}
 	where
 	\begin{align*}
-		\theta_k = \phi_{\bartheta}(\eta_k)
+		\theta_k = \tikzmark{phi_dest}{\phi_{\bartheta}}(\tikzmark{eta_dest}{\eta_k})
 	\end{align*}
-	and
+	with
 	\begin{align*}
-		\phi_{\bartheta}(\eta) = \begin{cases}
+		\tikzmark{phi_source}{\phi_{\bartheta}}(\eta) = \begin{cases}
 			\frac{1-\sgn(\eta)\bartheta}{1-\eta} &\text{ if }\abs{\eta}<\bartheta \\
 			1 &\text{ else }
-		\end{cases} \qquad
-		\eta_k = \frac{\hs_k^\top H_ky_k}{\norm{\hs_k}^2}
-	\end{align*}
+		\end{cases} \quad\text{ and }\quad
+		\tikzmark{eta_source}{\eta_k} = \frac{\hs_k^\top H_ky_k}{\norm{\hs_k}^2}
+	\end{align*}	
+	\tikzset{external/export=false}
+	\begin{tikzpicture}[remember picture, overlay, node distance = 1cm]
+		\draw[,->,thick] (phi_source) to [in=-90,out=90] (phi_dest);
+		\draw[,->,thick] (eta_source) to [in=-90,out=90] (eta_dest);
+	\end{tikzpicture}%
 \end{frame}
 
 \begin{frame}
@@ -212,7 +232,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \begin{frame}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
-	\caption{AA-I with Powell-like-regularisation and Restarting}
+	\caption{AA-I with Powell-like-regularisation and Restarting}\label{alg:aa1-pr}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
 	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\color{black}$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
@@ -242,11 +262,28 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\end{algorithm}
 \end{frame}
 
+\begin{frame}
+	\begin{lemma}[bound on $\norm{H_k}_2$]
+		In algorithm \ref{alg:aa1-pr} we have that
+		\begin{align*}
+			\norm{H_k}_2\leq \frac{1}{\bartheta^m}\brk*{3\brk*{\frac{1+\bartheta+\tau}{\tau}}^m-2}^{n-1}\,.
+		\end{align*}
+	\end{lemma}
+	\begin{proof}
+		This follows from Lemma (Restarting iteration) and Lemma (Powell-type regularisation).
+	\end{proof}
+\end{frame}
+
+\begin{frame}
+	\centering
+	\input{../Figures/Diagram_001}
+\end{frame}
+
 
 \subsection{Safeguarding steps}
 \begin{frame}
 	\frametitle{Safeguarding steps}
-	To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnoselskii-Mann steps which are given by
+	To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnosel'skii-Mann steps which are given by
 	\begin{align*}
 		x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)
 	\end{align*}
@@ -303,6 +340,24 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\end{theorem}
 \end{frame}
 
+%\begin{frame}
+%	\tikzstyle{lemma} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+%	\tikzstyle{arrow} = [thick,->,>=stealth]
+%	 
+%	\begin{tikzpicture}[node distance=2cm]
+%		\node (restartIteration) [lemma, text width=4cm] {Lemma (Restarting Iteration)};
+%		\node (Bk_welldefined) [lemma, below of=restartIteration] {$B_{k+1}$ well-defined};
+%		\node (Bk_invertible) [lemma, below of=Bk_welldefined] {$B_{k+1}$ invertible};
+%		\node (powell) [lemma, right of=restartIteration, xshift=4cm, text width=4cm] {Lemma (Powell-type regularisation)};
+%		\node (Hk_bound) [lemma, below of=powell] {Lemma(Bound of $H_k$)};
+%	\end{tikzpicture}
+%\end{frame}
+
+\begin{frame}
+	\centering
+	\input{../Figures/Diagram_002}
+\end{frame}
+
 
 \section{Numerical experiments}
 
@@ -310,15 +365,15 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 
 \begin{frame}
 	\frametitle{Regularised logistic regression}
-	We take $x\in\R^{2000\times 500}=, y\in\R^{2000}$ with  from the UCI Madelon dataset. The aim is to minimise
+	We take $x\in\R^{2000\times 500}$, $y\in\R^{2000}$ from the UCI Madelon dataset \cite{MadDat}. The aim is to minimise
 	\begin{align*}
 		F(\theta) = \frac{1}{2000}\sum_{i}\log\brk{1+\sum_jy_ix_{ij}\theta_j}+\frac{\lambda}{2}\norm{\theta}^2
 	\end{align*}
 	with gradient descent, i.e.\
 	\begin{align*}
-		f(\theta) = \theta-\alpha\nabla F(\theta)
+		f\colon \R^{500}\to\R^{500}, \quad \theta\mapsto\theta-\alpha\nabla F(\theta)
 	\end{align*}
-	for some $\alpha\in(0,2/L)$.
+	for some $\alpha$.
 \end{frame}
 
 \begin{frame}
@@ -332,8 +387,32 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \subsection*{Facility location}
 
 \begin{frame}
-	
+	\frametitle{Facility location}
+	The aim is to minimise
+	\begin{align*}
+		F\colon \R^{300}\to\R, \quad y\mapsto \sum_{i=1}^{500}\norm{y-c_i}
+	\end{align*}
+	for $c_i\in\R^{300}$ with sparsity $0.01$. This can lead to the formulation
+	\begin{align*}
+		\tilde{f}\colon \R^{500\times 300}\to\R^{500\times 300}, \quad
+		z\mapsto \brk*{z_i+2\tikzmark{avg_x_dest}{\avg{x}}-\tikzmark{xi_dest}{x_i}-\avg{z}}_i
+	\end{align*}
+	with
+	\begin{align*}
+		\tikzmark{avg_x_source}{\avg{x}} = \frac{1}{500}\sum_ix_i \qquad \tikzmark{xi_source}{x_i} = \tikzmark{prox_dest}{\prox_{\norm{\cdot}}}\brk*{z_i+c_i}-c_i
+	\end{align*}
+	and
+	\begin{align*}
+		\tikzmark{prox_source}{\prox_{\norm{\cdot}}}(v) = \brk*{1-\frac{1}{\norm{v}}}_+v\,.
+	\end{align*}
+	\tikzset{external/export=false}
+	\begin{tikzpicture}[remember picture, overlay, node distance = 0.5cm]
+		\draw[,->,thick] (avg_x_source) to [in=-125,out=60] (avg_x_dest);
+		\draw[,->,thick] (xi_source) to [in=-90,out=60] (xi_dest);
+%		\draw[,->,thick] (prox_source) to [in=-90,out=60] (prox_dest);
+	\end{tikzpicture}%
 \end{frame}
+
 
 \begin{frame}
 	\begin{figure}
@@ -341,6 +420,51 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 		\input{../Plots/norm_gk_CO.pgf}
 		\caption{Residual norms for the facility location problem.}
 	\end{figure}
+\end{frame}
+
+\section{Elastic net regression}
+
+\begin{frame}
+	\frametitle{Elastic net regression}
+	Our aim is to minimise
+	\begin{align*}
+		F\colon \R^{1000}\to \R, \quad x\mapsto \frac{1}{2}\norm{Ax-b}^2+\mu\brk*{\frac{1}{4}\norm{x}^2+\frac{1}{2}\norm{x}_1}
+	\end{align*}
+	with $A\in\R^{500\times 1000}$, $b\in\R^{500}$ and some $\mu\in\R$. From the Iterative Shrinkage-Thresholding Algorithm one obtains
+	\begin{align*}
+		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto S_{\alpha\mu/2}\brk*{x-\alpha\brk*{A^\top(Ax-b)+\frac{\mu}{2}x}}
+	\end{align*}
+	with shrinkage operator
+	\begin{align*}
+		S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_i
+	\end{align*}
+	and some $\alpha\in\R$.
+\end{frame}
+
+
+\begin{frame}
+	\begin{figure}
+		\centering
+		\input{../Plots/norm_gk_ISTA.pgf}
+		\caption{Residual norms for the elastic net regression problem.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\begin{figure}
+		\centering
+		{\scriptsize
+		% \tiny
+		\input{../Plots/aa1_safe_mem_ISTA.pgf}
+		}
+		\caption{Residual norms for the elastic net regression problem.}
+	\end{figure}
+\end{frame}
+
+\section{Summary}
+
+\begin{frame}
+	\frametitle{Summary}
 \end{frame}
 
 \section{Sources}
