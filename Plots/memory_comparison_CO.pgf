@@ -1,0 +1,99 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{crimson2143940}{RGB}{214,39,40}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{mediumpurple148103189}{RGB}{148,103,189}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.03)},
+  anchor=south west,
+  draw=lightgray204
+},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={iteration number \(\displaystyle k\)},
+xmin=-5, xmax=105,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={residual \(\displaystyle \norm{g(x_k)}/\norm{g(x_0)}\)},
+ymin=4.3166648231998e-09, ymax=2.50222448850812,
+ymode=log,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180, mark=x, mark size=3, mark options={solid}, only marks]
+table {%
+0 1
+10 0.00850118795434893
+20 0.000329098243298022
+30 3.4621065800553e-05
+40 1.72810455227764e-06
+50 1.45460447111187e-07
+60 1.08012644292921e-08
+};
+\addlegendentry{aa1-safe, m=2}
+\addplot [semithick, darkorange25512714, mark=|, mark size=3, mark options={solid}, only marks]
+table {%
+0 1
+10 0.0149992942946257
+20 0.0306915206686512
+30 0.000191373317294796
+40 8.77850888099894e-06
+50 1.42864946005807e-07
+};
+\addlegendentry{aa1-safe, m=5}
+\addplot [semithick, forestgreen4416044, mark=-, mark size=3, mark options={solid}, only marks]
+table {%
+0 1
+10 0.017204953904676
+20 0.0103896137006895
+30 0.00962774950657071
+40 0.00991953232781505
+50 0.00441762993775279
+60 0.0018836473888657
+70 0.00176410627969432
+80 5.72095726033429e-05
+90 1.0665148885895e-06
+100 3.21002400370046e-08
+};
+\addlegendentry{aa1-safe, m=10}
+\addplot [semithick, crimson2143940, mark=+, mark size=3, mark options={solid}, only marks]
+table {%
+0 1
+10 0.0230746745888101
+20 0.010337971233467
+30 0.0196537371842228
+40 0.00297258983025117
+50 0.000333456963926998
+60 8.89999800256321e-05
+70 1.57894252227471e-06
+80 7.81125888628876e-08
+};
+\addlegendentry{aa1-safe, m=20}
+\addplot [semithick, mediumpurple148103189, mark=x, mark size=3, mark options={solid}, only marks]
+table {%
+0 1
+10 0.0224380465013495
+20 0.018256127998538
+30 0.0674512054100487
+40 0.00751359486229957
+50 0.000505753099066176
+60 5.44884102451029e-05
+70 8.20559375909602e-07
+80 6.47991093698237e-08
+};
+\addlegendentry{aa1-safe, m=50}
+\end{axis}
+
+\end{tikzpicture}

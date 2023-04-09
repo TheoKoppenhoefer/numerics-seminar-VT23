@@ -6,7 +6,7 @@ from fixed_point_schemes import fixed_point_schemes
 
 
 def problem_loader(problem='CO', **kwargs):
-    # np.random.seed(455)
+    # np.random.seed(456)
     if problem == 'CO':
         m = 500
         n = 300
@@ -14,7 +14,7 @@ def problem_loader(problem='CO', **kwargs):
         def f(z):
             z = z.reshape((m, n))
             x = prox_norm(z+c) - c
-            return np.asarray((z+2*np.mean(x, axis=0)-x-np.mean(z, axis=0)).flatten()).ravel()
+            return np.asarray(z+2*np.mean(x, axis=0)-x-np.mean(z, axis=0)).ravel()
         x_0 = np.random.randn(n*m)
         x_0 = x_0 / norm(x_0)
         #kwargs['alpha'] = 1
@@ -27,12 +27,11 @@ def problem_loader(problem='CO', **kwargs):
         m = y.size
         n = x.shape[1]
         lam = 1E-2
-        L = norm(x)**2/(4*m)
+        L = (norm(x)**2)/(4*m)
         alpha = 2/(L+lam)
         yx = y@x
-        # TODO: double check the following
+        # TODO: double check the following - it seems somewhat fishy
         f = lambda theta: theta - alpha*(yx/(m*(1+yx@theta))+lam*theta)
-        # f = lambda theta: theta - alpha*(-y/(np.exp(yx@theta)+1)@x/m  + lam*theta)
         x_0 = np.random.randn(n)
         x_0 = x_0 / norm(x_0) * 1E-3
         # kwargs['alpha']=alpha
@@ -63,7 +62,7 @@ def problem_loader(problem='CO', **kwargs):
 def prox_norm(x):
     tmp = 1-1/norm(x, axis=1)
     tmp[tmp<0] = 0
-    return tmp*x
+    return np.multiply(np.reshape(tmp,(tmp.size,1)),x)
 
 def shrinkage_op(x, kappa):
     tmp = np.abs(x)-kappa

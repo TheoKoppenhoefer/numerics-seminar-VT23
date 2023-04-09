@@ -52,85 +52,273 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \section{AA-II}
 \subsection{AA-II}
 \begin{frame}
-%	\IncMargin{1em}
+	To keep things simple we try
+
+	\begin{figure}
 	\begin{algorithm}[H]
-	\caption{General AA}\label{alg:cap}
+	\caption{Fixed point iteration (original)}\label{alg:cap}
 	\SetKwInOut{Input}{Input}
 	
-	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$}
+	\Input{Initial value $x_0\in\R^n$ and function $f\colon\R^n\to\R^n$.}
 	\BlankLine
 	\For{$k=0,1,\dots$}{
-	  Choose $m_k\in\{0,\dots,k\}$\;
-	  Choose $\alpha^k\in \R^{m_k}$ such that $\sum_i\alpha_i^k=1$\;
-	  $f_k =f\brk*{x_k}$
-	  $x_{k+1} = \sum_i \alpha_i^kf_{k-m_k+i}$\;
+		Set $x_{k+1} =f\brk*{x_k}$.
 	}
 	\end{algorithm}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}
+	\begin{block}{This works, but ...} \vspace{1cm}
+		\includegraphics[scale=0.25]{../Figures/turtle}	
+	\end{block}
+\end{frame}
+\begin{frame}
+	\begin{block}{We want to be like...} \vspace{2cm}
+		\includegraphics[scale=0.17]{../Figures/hare}
+	\end{block}
+\end{frame}
+
+\begin{frame}
+%	\IncMargin{1em}
+	We may as well use the information gained from previous evaluations. If we form a weighted average we get
+	
+	\begin{figure}
+	\begin{algorithm}[H]
+	\caption{General AA (Anderson Acceleration)}\label{alg:cap}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	
+	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
+	\BlankLine
+	\For{$k=0,1,\dots$}{
+		{\color{black}
+		Set $f_k =f\brk*{x_k}$.
+		
+		Choose $\alpha = \alpha^k\in \R^{k}$ such that $\sum_i\alpha_i=1$.
+	  
+		Set $x_{k+1} = \sum_i \alpha_if_{i}$.
+		}
+	}
+	\end{algorithm}
+	\end{figure}
 \end{frame}
 
 
 \begin{frame}
 %	\IncMargin{1em}
+	Since finding a fixed point of $f$ is equivalent to finding a zero of $g=\Id-f$ we have the ansatz
+	
+	\begin{figure}
 	\begin{algorithm}[H]
-	\caption{General AA}
+	\caption{AA-II}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
-	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$}
+	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
 	\BlankLine
 	\For{$k=0,1,\dots$}{
-	  Choose $m_k\in\{0,\dots,k\}$\;
-	  Choose $\alpha^k\in \R^{m_k}$ such that $\sum_i\alpha_i^k=1$ {\color{black} and such that $\alpha$ minimises $\norm{\sum_i\alpha^k_ig^i}_2$}\;
-	  $f_k =f\brk*{x_k}$\;
-	  $x_{k+1} = \sum_i \alpha_i^kf_{k-m_k+i}$\;
+	  Set $f_k =f\brk*{x_k}$.
+	  
+	  {\color{black}Set $g_k = x_k-f_k$.}
+	  
+	  Choose $\alpha\in \R^{k}$ such that $\sum_i\alpha_i=1$ {\color{black} and such that $\alpha$ minimises $\norm{\sum_i\alpha_ig_i}_2$}.
+	  
+	 Set $x_{k+1} = \sum_i \alpha_if_{i}$.
 	}
 	\end{algorithm}
+	\end{figure}
 \end{frame}
 
 \begin{frame}
-	\frametitle{AA-II}
-	Define residual $g=\Id-f\colon\R^n\to\R^n$ and $g_k = g(x_k)$.
-	Choose $\alpha\in\R^{m_k}$ such that it minimises
+	\frametitle{Rewriting AA-II}
+	Setting 
 	\begin{align*}
-		\norm{\sum_i\alpha^k_ig_i}_2
+		\alpha=\vect{\gamma_0 \\ \gamma_1-\gamma_0 \\ \vdots \\ \gamma_{k}-\gamma_{k-1} \\ 1-\gamma_k}
+		\text{ and }
+		Y_k = \begin{bmatrix}
+			& & \\
+			g_{1}-g_0 & \cdots & g_{k}-g_{k-1} \\
+			& &
+		\end{bmatrix} \in\R^{n\times k}
 	\end{align*}
-	and
+	one obtains the least squares problem
 	\begin{align*}
-		\sum_i\alpha^k_i = 1\,.
+		\min_{\substack{\alpha\in\R^{k+1} \\ \sum_i\alpha_i=1}}\norm*{\sum_i\alpha_ig_i}
+		= \min_{\gamma \in\R^k}\norm{g_k-Y_k\gamma}
 	\end{align*}
-	It can be shown that then
+	which is solved by
 	\begin{align*}
-		x_{k+1} = \sum_i \alpha_i^kf\brk*{x_{k-m_k+i}} = x_k-H_kg_k
+		\gamma= \gamma^k = \brk*{Y_k^\top Y_k}^{-1}Y_k^\top g_k\,.
 	\end{align*}
-	for some $H_k\in\R^{n\times m_k}$ such that $H_k$ minimises $\norm{H_k-\Id}_F$.
+\end{frame}
+
+\begin{frame}
+	If we now set
+	\begin{align*}
+		S_k = \begin{bmatrix}
+			& & \\
+			x_1-x_0 & \cdots & x_{k}-x_{k-1} \\
+			& & \\
+		\end{bmatrix} \in\R^{n\times k}
+	\end{align*}
+	we see that
+	\begin{align*}
+		S_k -Y_k &= \begin{bmatrix}
+			& & \\
+			x_1-x_0-g_0+g_1 & \cdots & x_{k}-x_{k-1}-g_{k}+g_{k-1} \\
+			& & \\
+		\end{bmatrix} \\
+		&= \begin{bmatrix}
+			& & \\
+			f(x_1)-f(x_0) & \cdots & f(x_{k})-f(x_{k-1}) \\
+			& & \\
+		\end{bmatrix}
+	\end{align*}
+\end{frame}
+
+\begin{frame}
+	and hence
+	\begin{align*}
+		x_{k+1} &= \sum_i\alpha_if(x_i) \\
+		&= f_k -(S_k-Y_k)\gamma_k \\ \\
+		&\tikzmark{def_gamma}{=} x_k -\underbrace{\brk*{\Id+(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top}}_{=H_k}g_k \\
+		&= x_k -H_kg_k\,.
+	\end{align*}
+	\tikzset{external/export=false}
+	\begin{tikzpicture}[remember picture, overlay, node distance = 0.3cm]
+		\node[,text width=10cm] (def_gamma_descr) [above right=0.2cm and 0.1cm of def_gamma]{$\gamma=\brk*{Y_k^\top Y_k}^{-1}Y_k^\top$};
+		\draw[,->,thick] (def_gamma_descr) to [in=90,out=180] (def_gamma);
+	\end{tikzpicture}%
+\end{frame}
+
+\begin{frame}
+	We thus have the reformulation
+	\begin{figure}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-II (reformulated)}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
+	\BlankLine
+	{\color{black}Set $x_1 =f(x_0)$.}
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_k)$.
+		
+		{\color{black}Construct $S_k$ and $Y_k$ from $g_0,\dots,g_k$ and $x_0,\dots, x_k$.
+		
+		Set $H_k = \Id +(S_k-Y_k)(Y_k^\top Y_k)^{-1}Y_k^\top$.
+%		$s_{k-1}= x_k-x_{k-1}$ and
+%		$y_{k-1}= g_k-g_{k-1}$.
+		
+		Set $x_{k+1}= x_k-H_kg_k$.}
+	}
+	\end{algorithm}
+	\end{figure}
 \end{frame}
 
 
 \subsection{AA-I}
 \begin{frame}
 	\frametitle{AA-I}
+	This is the form of a quasi-Newton-like method so one could expect $H_k$ to be an approximate inverse of $\nabla f(x_k)$. Indeed
+	\begin{proposition}[Approximate inverse Jacobian]
+		$H_k$ minimises $\norm{H_k-\Id}_F$ under the multisecant condition $H_kS_k=Y_k$.
+	\end{proposition}
+	From Broydens method we know that it is a good idea to approximate the Jacobian rather than its inverse. This yields the definition of $B_k$ which minimises $\norm{B_k-\Id}_F$ under the condition $B_kY_k=S_k$. Analogously to AA-II we have
+	\begin{align*}
+		B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top\,.
+	\end{align*}
 \end{frame}
 
 \begin{frame}
+	This yields the AA-I algorithm
+	\begin{figure}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
 	\caption{AA-I}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
-	\Input{$x^0\in\R^n$ and $f\colon\R^n\to\R^n$}
+	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
 	\BlankLine
-	Set $H_0=\Id$, $x_1=f\brk{x_0}$.
+	Set $x_1=f(x_0)$
 	
 	\For{$k=0,1,\dots$}{
-		Set $g_k= g(x_{k})$,
-		$s_{k-1}= x_k-x_{k-1}$ and
-		$y_{k-1}= g_k-g_{k-1}$.
+		Set $g_k= g(x_k)$.
 		
-		Set $\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		Construct $S_k$ and $Y_k$ from $g_0,\dots,g_k$ and $x_0,\dots, x_k$.
+				
+		{\color{black}Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top$.
 		
-		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}y_{k-1})s_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}y_{k-1}}$ and $x_{k+1}= x_k-H_kg_k$.
+		Set $H_k = B_k^{-1}$.}
+%		$s_{k-1}= x_k-x_{k-1}$ and
+%		$y_{k-1}= g_k-g_{k-1}$.
+		
+		Set $x_{k+1}= x_k-H_kg_k$.
+	}
+	\end{algorithm}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	Luckily for us we can save a lot of computation by using the rank-1 update formula
+	\begin{proposition}[Rank-1 update for $B_k$]
+		We have
+		\begin{align*}
+			B_{k+1} = B_k+\frac{\brk*{y_k-B_ks_k}\hs_k^\top}{\hs_k^\top s_k}
+		\end{align*}
+		where $y_k = g_{k+1}-g_k$, $B_0=\Id$ and
+		\begin{align*}
+			\hs_k = s_k-\sum_{j=0}^{k-1}\frac{\hs_k^\top s_k}{\norm{\hs_k}^2}\hs_k
+		\end{align*}
+		is the Gram-Schmidt orthogonalisation of $s_k=x_{k+1}-x_k$.
+	\end{proposition}
+\end{frame}
+
+\begin{frame}
+	From the Sherman-Morrison formula it then follows that
+	\begin{proposition}[Rank-1 update for $H_k$]
+		We have
+		\begin{align*}
+			H_{k+1} = H_k+\frac{\brk*{s_k-H_ky_k}\hs_k^\top H_k}{\hs_k^\top H_ky_k}
+		\end{align*}
+		where $y_k = g_{k+1}-g_k$, $H_0=\Id$ and
+		\begin{align*}
+			\hs_k = s_k-\sum_{j=0}^{k-1}\frac{\hs_k^\top s_k}{\norm{\hs_k}^2}\hs_k
+		\end{align*}
+		is the Gram-Schmidt orthogonalisation of $s_k=x_{k+1}-x_k$.
+	\end{proposition}
+\end{frame}
+
+\begin{frame}
+	Taking everything together we obtain
+	\begin{figure}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-I (rank-1 update)}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
+	\BlankLine
+	Set $H_0=\Id$ and $x_1=f\brk{x_0}$.
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_{k})$.
+		
+		{\color{black}
+		Set $s_{k-1}= x_k-x_{k-1}$,
+		$y_{k-1}= g_k-g_{k-1}$ and
+		$\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}y_{k-1})s_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}y_{k-1}}$.}
+		
+		Set  $x_{k+1}= x_k-H_kg_k$.
 		
 	}
 	\end{algorithm}
+	\end{figure}
 \end{frame}
 
 \section{Modifications to AA-I}
@@ -138,7 +326,11 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 
 \begin{frame}	
 	\frametitle{Powell-type regularisation}
-	Note that $B_k$ may be singular. To solve this set
+	Note that $B_k$ may be singular. To fix this set
+	\begin{align*}
+		\tiy_k=\theta_ky_k+(1-\theta_k)B_ks_k
+	\end{align*}
+	or equivalently
 	\begin{align*}
 		\tiy_k=\theta_ky_k+(1-\theta_k)B_ks_k
 	\end{align*}
@@ -181,9 +373,9 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\caption{AA-I with Powell-like-regularisation}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
-	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$}
+s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\BlankLine
-	Set $H_0=\Id$, $x_1=f\brk{x_0}$.
+	Set $H_0=\Id$ and $x_1=f\brk{x_0}$.
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$,
@@ -336,7 +528,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \begin{frame}
 	\frametitle{Convergence result}
 	\begin{theorem}[Convergence]
-		Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k\xrightarrow{k\to\infty}x_*$ and $f(x_*)=x_*$ is a fixed point.
+		Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k\xrightarrow{k\to\infty}x$ and $f(x)=x$ is a fixed point.
 	\end{theorem}
 \end{frame}
 
@@ -379,7 +571,19 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \begin{frame}
 	\begin{figure}
 		\centering
-		\input{../Plots/norm_gk_GD.pgf}
+		{\scriptsize
+		\input{../Plots/method_comparison_GD.pgf}
+		}
+		\caption{Residual norms for the logistic regression problem.}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\begin{figure}
+		\centering
+		{\scriptsize
+		\input{../Plots/memory_comparison_GD.pgf}
+		}
 		\caption{Residual norms for the logistic regression problem.}
 	\end{figure}
 \end{frame}
@@ -417,7 +621,20 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \begin{frame}
 	\begin{figure}
 		\centering
-		\input{../Plots/norm_gk_CO.pgf}
+		{\scriptsize
+		\input{../Plots/method_comparison_CO.pgf}
+		}
+		\caption{Residual norms for the facility location problem.}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}
+	\begin{figure}
+		\centering
+		{\scriptsize
+		\input{../Plots/memory_comparison_CO.pgf}
+		}
 		\caption{Residual norms for the facility location problem.}
 	\end{figure}
 \end{frame}
@@ -445,7 +662,9 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \begin{frame}
 	\begin{figure}
 		\centering
-		\input{../Plots/norm_gk_ISTA.pgf}
+		{\scriptsize
+		\input{../Plots/method_comparison_ISTA.pgf}
+		}
 		\caption{Residual norms for the elastic net regression problem.}
 	\end{figure}
 \end{frame}
@@ -455,7 +674,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 		\centering
 		{\scriptsize
 		% \tiny
-		\input{../Plots/aa1_safe_mem_ISTA.pgf}
+		\input{../Plots/memory_comparison_ISTA.pgf}
 		}
 		\caption{Residual norms for the elastic net regression problem.}
 	\end{figure}

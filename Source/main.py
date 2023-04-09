@@ -40,5 +40,10 @@ if __name__ == '__main__':
     ms = [2,5,10,20,50]
     withms = [True, True, False]
 
-    run_problems(problems[2:3], methods[1:2], ms, [True], export_name='aa1_safe_mem', show_plots=False, plot_density=0.1)
+    # run_problems(problems[1:2], methods, ms, len(problems)*[False], export_name='method_comparison', show_plots=True, plot_density=1)
+
+
+    if True:
+        run_problems(problems, methods, ms, len(problems)*[False], export_name='method_comparison', show_plots=False, plot_density=1)
+        run_problems(problems, methods[1:2], ms, len(problems)*[True], export_name='memory_comparison', show_plots=False, plot_density=0.1)
     
