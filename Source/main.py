@@ -11,20 +11,28 @@ import itertools
 
 
 # markers = itertools.cycle(('o', '*', 'v', '^', '>', '<', '8', 's', 'p', 'P', 'h', 'H', 'X', 'd')) 
-markers = itertools.cycle(('+', 'x', '|', '_')) 
+# markers = itertools.cycle(('+', 'x', '|', '_')) 
+markers = itertools.cycle(('x'))
 
-def run_problems(problems, methods, ms, withms, export_name='norm_gk', show_plots=True, plot_density=0.1):
-    # vary problems and solvers               
-    plot_density = int(1/plot_density)
+def run_problems(problems, methods, export_name='norm_gk', show_plots=True, ms = None, plot_densities=None, withms=None, K_maxs=None):
+    # vary problems and solvers
 
-    for problem in problems:
+    if not withms:
+        withms = len(methods)*[False]
+    if not plot_densities:
+        plot_densities = len(problems)*[1]
+    if not K_maxs:
+        K_maxs = len(problems)*[1000]
+
+    for i, problem in enumerate(problems):
+        plot_density = int(1/plot_densities[i])
         fig, ax = plt.subplots()
-        for i, method in enumerate(methods):
-            tmp = ms if withms[i] else [5]
+        for j, method in enumerate(methods):
+            tmp = ms if withms[j] else [5]
             for m in tmp:
-                solver = problem_loader(problem, method=method, m=m)
+                solver = problem_loader(problem, method=method, m=m, K_max=K_maxs[i])
                 norm_g_ks = solver.run()
-                labeltext = f'{method}, m={m}' if withms[i] else f'{method}'
+                labeltext = f'{method}, m={m}' if withms[j] else f'{method}'
                 ax.semilogy(range(0, len(norm_g_ks), plot_density), norm_g_ks[::plot_density], label=labeltext, linestyle='', marker=next(markers))
         plt.legend(title='method')
         if show_plots:
@@ -35,15 +43,18 @@ def run_problems(problems, methods, ms, withms, export_name='norm_gk', show_plot
 
 
 if __name__ == '__main__':
-    problems = ['CO', 'GD', 'ISTA']
-    methods = ['aa1', 'aa1-safe', 'original']
+    problems = ['CO', 'GD', 'ISTA', 'VI']
+    methods = ['aa1-matrix', 'aa1', 'aa1-safe', 'original']
     ms = [2,5,10,20,50]
     withms = [True, True, False]
 
-    # run_problems(problems[1:2], methods, ms, len(problems)*[False], export_name='method_comparison', show_plots=True, plot_density=1)
 
-
+    if False:
+        run_problems(problems[:-1], methods[1:], 'method_comparison', False)
+    if False:
+        run_problems(problems[:-1], methods[2:3], 'memory_comparison', False, ms, len(problems)*[0.1], len(methods)*[True])
     if True:
-        run_problems(problems, methods, ms, len(problems)*[False], export_name='method_comparison', show_plots=False, plot_density=1)
-        run_problems(problems, methods[1:2], ms, len(problems)*[True], export_name='memory_comparison', show_plots=False, plot_density=0.1)
+        run_problems(problems[-1:], methods, 'method_comparison', False, K_maxs=[100])
+    if True:
+        run_problems(problems[-1:], methods[2:3], 'memory_comparison', False, ms, withms=[True], K_maxs=[100])
     

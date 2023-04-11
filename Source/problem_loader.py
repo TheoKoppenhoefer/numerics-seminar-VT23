@@ -6,7 +6,7 @@ from fixed_point_schemes import fixed_point_schemes
 
 
 def problem_loader(problem='CO', **kwargs):
-    # np.random.seed(456)
+    np.random.seed(456)
     if problem == 'CO':
         m = 500
         n = 300
@@ -53,6 +53,21 @@ def problem_loader(problem='CO', **kwargs):
         f = lambda x: shrinkage_op(x-alpha*(A.transpose()@(A@x-b)+mu/2*x), alpha*mu/2)
         # kwargs['alpha'] = alpha
         kwargs['tol'] = 1E-8
+
+    elif problem == 'VI':
+        S = 300
+        A = 200
+        gamma = 0.99
+        P = []
+        for i in range(A):
+            P_a = ss.random(S, S, 1E-2)+1E-3*ss.eye(S)
+            P_a = np.diag(np.array(1/np.sum(P_a, axis=1)).ravel())*P_a
+            P.append(P_a)
+        R = ss.random(S, A, 1E-2)
+        x_0 = np.random.randn(S)
+        x_0 = x_0 / norm(x_0)
+        f = lambda x: np.asarray(np.max(R+ gamma*np.array([P[a]@x for a in range(A)]).transpose(), axis=1)).ravel()
+
     
     else:
         raise Exception('Invalid problem name given.')

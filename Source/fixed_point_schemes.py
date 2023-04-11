@@ -15,9 +15,15 @@ class fixed_point_schemes():
         self.theta = theta
         self.tau = tau
         self.alpha = alpha
+
+        # for the matrix-free implementation
         # H = Id + sum_i v_iw_i^T
         self.vs = np.zeros((m,n))
         self.ws = np.zeros_like(self.vs)
+
+        # for the implementation with matrices
+        self.S_k = np.zeros_like(self.vs)
+        self.Y_k = np.zeros_like(self.S_k)
 
         self.x_km1 = x_0
         self.x_k = f(x_0)
@@ -25,19 +31,23 @@ class fixed_point_schemes():
         self.xtilde_k = self.x_k
         self.m_k = 0
         self.n_AA = 0
-        g_km1 = self.g(self.x_km1)
-        self.norm_g_0 = norm(g_km1)
+        self.g_km1 = self.g(self.x_km1)
+        self.norm_g_0 = norm(self.g_km1)
         self.DU = D*self.norm_g_0
         self.shat_ks = np.zeros_like(self.vs)
         self.eps = eps
         self.tol = tol
         self.K_max = int(K_max)
+
+        # choose a method
         if method == 'aa1-safe':
             self.step = self.step_aa1prs
         elif method == 'original':
             self.step = self.step_original
         elif method == 'aa1':
             self.step = self.step_aa1
+        elif method == 'aa1-matrix':
+            self.step = self.step_aa1_matrix
         else:
             raise Exception('Invalid solver given.')
         
@@ -45,7 +55,11 @@ class fixed_point_schemes():
     def run(self):
         norm_g_ks = [1]
         for k in range(self.K_max):
-            x_k, norm_g_k = self.step()
+            try:
+                x_k, norm_g_k = self.step()
+            except:
+                print('Algorithm broke down.')
+                break
             norm_g_k = norm_g_k/self.norm_g_0
             norm_g_ks.append(norm_g_k)
             if norm_g_k < self.tol or norm_g_k > 1/self.tol:
@@ -105,19 +119,40 @@ class fixed_point_schemes():
         else:
             self.x_k = self.alpha * self.x_k + (1-self.alpha)*self.f(self.x_k)
         return self.x_k, norm_g_k
+
+    def step_original(self):
+        # basic fixed point iteration
+        self.x_k = self.f(self.x_k)
+        norm_g_k = norm(self.g(self.x_k))
+        return self.x_k, norm_g_k
+    
+    def step_aa1_matrix(self):
+        # implementation of the aa1 with matrices
+        self.m_k += 1
+        self.m_k = np.min((self.m_k, self.m))
+        g_k = self.g(self.x_k)
+        norm_g_k = norm(g_k)
+        self.S_k[:-1,:] = self.S_k[1:,:]
+        self.S_k[-1,:] = self.x_k-self.x_km1
+        self.Y_k[:-1,:] = self.Y_k[1:,:]
+        self.Y_k[-1,:] = g_k-self.g_km1
+        self.g_km1 = g_k
+        self.x_km1 = self.x_k
+        S_k_cut = self.S_k[-self.m_k:,:]
+        Y_k_cut = self.Y_k[-self.m_k:,:]
+        try:
+            tmp = np.linalg.solve(S_k_cut@Y_k_cut.transpose(), S_k_cut@g_k)
+        except np.linalg.LinAlgError:
+            tmp = np.linalg.lstsq(S_k_cut@Y_k_cut.transpose(), S_k_cut@g_k, rcond=None)[0]
+        self.x_k = self.x_k -(g_k+(S_k_cut-Y_k_cut).transpose()@tmp)
+        return self.x_k, norm_g_k
+        
     
     def eval_H(self, x):
         return x + self.vs.transpose()@(self.ws@x)
     
     def eval_Ht(self, x):
         return x + self.ws.transpose()@(self.vs@x)
-    
-
-    def step_original(self):
-        self.x_k = self.f(self.x_k)
-        norm_g_k = norm(self.g(self.x_k))
-        return self.x_k, norm_g_k
-
 
     def phi(self, x, theta):
         if np.abs(x)>= theta:
