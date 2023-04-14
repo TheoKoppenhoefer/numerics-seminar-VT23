@@ -5,7 +5,7 @@
 %%%%% TITLE PAGE
 
 \subject{, VT23}
-\title{%Junzi Zhang, Brendan O'Donoghue, Stephen Boyd: 
+\title{Junzi Zhang, Brendan O'Donoghue, Stephen Boyd: 
 Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iterations}
 %\subtitle{}
 \author{Theo Koppenhöfer}
@@ -19,7 +19,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 
 \begin{document}
 
-\frame[plain]
+%\frame[plain]
 
 
 
@@ -84,7 +84,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \subsection{General AA}
 \begin{frame}
 	\frametitle{General AA}
-	We may as well use the information gained from previous evaluations. If we form a weighted average we get
+	We may as well use the information gained from previous evaluations. In the following we assume for simplicity that our memory is unlimited. If we form a weighted average we get
 	
 	\begin{figure}
 	\begin{algorithm}[H]
@@ -475,7 +475,9 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 
 \begin{frame}
 	\centering
+	\scalebox{0.9}{
 	\input{../Figures/Diagram_001}
+	}
 \end{frame}
 
 
@@ -523,12 +525,14 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 			Set $x_{k+1}=\tix_{k+1}$ and $n_{AA}= n_{AA}+1$.
 		}
 		\Else{
-			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$
+			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$.
 		}
 		}
 	}
 	\end{algorithm}
 \end{frame}
+
+\SetAlFnt{\normalsize}
 
 \section{Convergence result}
 
@@ -554,7 +558,152 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 
 \begin{frame}
 	\centering
+	\scalebox{0.9}{
 	\input{../Figures/Diagram_002}
+	}
+\end{frame}
+
+\begin{frame}
+	\begin{proofs}[Proof, part 1]
+	The proof follows \cite[Theorem 6]{ZhaAA}.
+	We partition $\N=K_{AA}\sqcup K_{KM}$ where $K_{AA}=\brk[c]{k_0,k_1,\dots}$ denote the indices $k$ where the algorithm chose an AA-step (a) and $K_{KM}=\brk[c]{l_0,l_1,\dots}$ where the algorithm chose a KM-step (b).
+	
+	\begin{center}
+	\begin{algorithm}[H]
+		\uIf{$\norm{g_k}\leq D\barU(n_{AA}+1)^{-(1+\e)}$}{
+			Set $x_{k+1}=\tix_{k+1}$ and $n_{AA}= n_{AA}+1$. \brkcomment*[r]{a}
+		}
+		\Else{
+			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$. \brkcomment*[r]{b}
+		}
+	\caption{The two cases for $x_{k+1}$.}
+	\end{algorithm}
+	\end{center}
+	\end{proofs}
+\end{frame}
+
+
+\begin{frame}
+	\begin{proofs}[Proof, part 1 (cont.).]
+	Let $y$ be a fixed point. We distinguish
+	\begin{description}
+		\item[case (a)]
+		$k\in K_{AA}$ then
+		\newconstant{upperHk}
+		\newconstant{CDU}
+		\begin{equation}
+		\begin{aligned}
+			\norm{x_{k+1}-y}&\leq \norm{x_k-y}+\norm{H_kg_k} \\
+			&\leq \norm{x_k-y}+\useconstant{upperHk}\norm{g_k} \\
+			&\leq \norm{x_k-y}+\useconstant{CDU}(k+1)^{-(1+\e)}
+			\label{eq:16}
+		\end{aligned}
+		\end{equation}
+		\item[case (b)]
+		$k\in K_{KM}$ then (motivate this)
+		\begin{align}
+			\norm{x_{k+1}-y}^2\leq \norm{x_k-y}^2-\alpha(1-\alpha)\norm{g_k}^2\leq \norm{x_k-y}^2
+			\label{eq:17}
+		\end{align}
+	\end{description}
+	Hence in any case
+	\newconstant{E}
+	\begin{align*}
+		\norm{x_k-y}
+		&\leq \norm{x_0-y}+\sum_{l=0}^{k-1}\norm{x_{l+1}-x_l} \\
+		&\leq \norm{x_0-y}+\useconstant{CDU}\sum_k(k+1)^{-(1+\e)}
+		= \useconstant{E}<\infty\,.
+	\end{align*}
+	\end{proofs}
+\end{frame}
+
+
+\begin{frame}
+	\begin{proofs}[Proof, part 1 (cont.).]
+	It then follows that
+	\begin{equation}
+	\begin{aligned}
+		a_{k+1} &= \norm{x_{k+1}-y}^2 \\
+		&\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq} \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\underbrace{\norm{x_k-y}}_{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
+		&= a_k+b_k
+	\end{aligned}
+	\label{eq:19}
+	\end{equation}
+	and hence
+	\begin{align*}
+		\alpha(1-\alpha)\sum_i\norm{g_{l_i}}^2
+		\stackrel{\eqref{eq:17}}{\leq} \sum_i a_{l_i}-a_{l_i+1}
+		\stackrel{\eqref{eq:19}}{\leq}a_0+\sum_k b_k
+		<\infty
+	\end{align*}
+	We therefore have $\lim_i\norm{g_{l_i}}=0$. It also follows from $\norm{g_{k_i}}\leq D\barU (i+1)^{-(1+\e)}$ that $\lim_i\norm{g_{k_i}}=0$. Thus indeed $\lim_k\norm{g_k}=0$.
+	\end{proofs}
+\end{frame}
+
+
+\begin{frame}
+	\begin{proofs}[Proof, part 2.]
+	Let now $n_j$ and  $N_j\geq n_j$ be such that
+	\begin{align*}
+		a_{n_j}\xrightarrow{j\to\infty}\liminf_ka_k=\underline{a} \\
+		a_{N_j}\xrightarrow{j\to\infty}\limsup_ka_k=\overline{a}	
+	\end{align*}
+	Then it follows that
+	\begin{align*}
+		\overline{a}-\underline{a}
+		\xleftarrow{n_j\to\infty}\overline{a}-a_{n_j}
+		\xleftarrow{N_j\to\infty}a_{N_j}-a_{n_j}
+		= \sum_{k=n_j}^{N_j-1}a_{k+1}-a_k
+		\leq \sum_{k=n_j}^\infty b_k
+		\xrightarrow{n_j\to\infty}0
+	\end{align*}
+	so
+	\begin{align*}
+		\limsup_ka_k=\overline{a}\leq \underline{a}=\liminf_ka_k
+	\end{align*}
+	and thus $a_k=\norm{x_k-y}$ converges to some $b$.
+	\end{proofs}
+\end{frame}
+
+
+\begin{frame}
+	\begin{proofs}[Proof, part 3.]
+	Let $k_j$ and $l_j$ be convergent subsequences of $x_k$ convergent against $y_1$ and $y_2$ respectively. Since by continuity of $g$
+	\begin{align*}
+		\norm{g(y_1)}=\lim_j\norm{g(x_{k_j})}=0
+	\end{align*}
+	we have that $y_1$ is a fixed point and $y_2$ too.
+	Now
+	\begin{align*}
+		\norm{y_1} 
+		\xleftarrow{j\to\infty} \norm{x_{k_j}}^2
+		= \norm{x_k-y}^2+\norm{y}^2+2y^\top x_{k_j}
+		\xrightarrow{j\to\infty} b^2+\norm{y}^2+2y^\top y_1
+	\end{align*}
+	and analogously for $y_2$. Thus
+	\begin{align*}
+		\norm{y_i}=b^2+\norm{y}^2+2y^\top y_i
+	\end{align*}
+	which implies
+	\begin{align*}
+		2y^\top(y_1-y_2) = \norm{y_1}^2-\norm{y_2}^2
+	\end{align*}
+	\end{proofs}
+\end{frame}
+
+
+\begin{frame}
+	\begin{proofs}[Proof, part 3 (cont.).]
+	It then follows from $y\in\brk[c]{y_i}_i$ that
+	\begin{align*}
+		y_1^\top(y_1-y_2) = y_2^\top(y_1-y_2)
+	\end{align*}
+	and further
+	\begin{align*}
+		(y_1-y_2)^\top(y_1-y_2) = 0
+	\end{align*}
+	and thus $y_1=y_2$. We have shown that two convergent subsequences have the same limit and hence $x_k$ is convergent and the solution must be a fixed point of $f$.
+	\end{proofs}
 \end{frame}
 
 
@@ -562,89 +711,89 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 
 \subsection{Regularised logistic regression}
 
-\begin{frame}
-	\frametitle{Regularised logistic regression}
-	We take $x\in\R^{2000\times 500}$, $y\in\R^{2000}$ from the UCI Madelon dataset \cite{MadDat}. The aim is to minimise
-	\begin{align*}
-		F(\theta) = \frac{1}{2000}\sum_{i}\log\brk{1+\sum_jy_ix_{ij}\theta_j}+\frac{\lambda}{2}\norm{\theta}^2
-	\end{align*}
-	with gradient descent, i.e.\
-	\begin{align*}
-		f\colon \R^{500}\to\R^{500}, \quad \theta\mapsto\theta-\alpha\nabla F(\theta)
-	\end{align*}
-	for some $\alpha$.
-\end{frame}
-
-\begin{frame}
-	\begin{figure}
-		\centering
-		{\scriptsize
-		\input{../Plots/method_comparison_GD.pgf}
-		}
-		\caption{Residual norms for the logistic regression problem.}
-	\end{figure}
-\end{frame}
-
-\begin{frame}
-	\begin{figure}
-		\centering
-		{\scriptsize
-		\input{../Plots/memory_comparison_GD.pgf}
-		}
-		\caption{Residual norms for the logistic regression problem.}
-	\end{figure}
-\end{frame}
-
-\subsection{Facility location}
-
-\begin{frame}
-	\frametitle{Facility location}
-	The aim is to minimise
-	\begin{align*}
-		F\colon \R^{300}\to\R, \quad y\mapsto \sum_{i=1}^{500}\norm{y-c_i}
-	\end{align*}
-	for $c_i\in\R^{300}$ with sparsity $0.01$. This can lead to the formulation
-	\begin{align*}
-		\tilde{f}\colon \R^{500\times 300}\to\R^{500\times 300}, \quad
-		z\mapsto \brk*{z_i+2\tikzmark{avg_x_dest}{\avg{x}}-\tikzmark{xi_dest}{x_i}-\avg{z}}_i
-	\end{align*}
-	with
-	\begin{align*}
-		\tikzmark{avg_x_source}{\avg{x}} = \frac{1}{500}\sum_ix_i \qquad \tikzmark{xi_source}{x_i} = \tikzmark{prox_dest}{\prox_{\norm{\cdot}}}\brk*{z_i+c_i}-c_i
-	\end{align*}
-	and
-	\begin{align*}
-		\tikzmark{prox_source}{\prox_{\norm{\cdot}}}(v) = \brk*{1-\frac{1}{\norm{v}}}_+v\,.
-	\end{align*}
-	\tikzset{external/export=false}
-	\begin{tikzpicture}[remember picture, overlay, node distance = 0.5cm]
-		\draw[,->,thick] (avg_x_source) to [in=-125,out=60] (avg_x_dest);
-		\draw[,->,thick] (xi_source) to [in=-90,out=60] (xi_dest);
-%		\draw[,->,thick] (prox_source) to [in=-90,out=60] (prox_dest);
-	\end{tikzpicture}%
-\end{frame}
-
-
-\begin{frame}
-	\begin{figure}
-		\centering
-		{\scriptsize
-		\input{../Plots/method_comparison_CO.pgf}
-		}
-		\caption{Residual norms for the facility location problem.}
-	\end{figure}
-\end{frame}
-
-
-\begin{frame}
-	\begin{figure}
-		\centering
-		{\scriptsize
-		\input{../Plots/memory_comparison_CO.pgf}
-		}
-		\caption{Residual norms for the facility location problem.}
-	\end{figure}
-\end{frame}
+%\begin{frame}
+%	\frametitle{Regularised logistic regression}
+%	We take $x\in\R^{2000\times 500}$, $y\in\R^{2000}$ from the UCI Madelon dataset \cite{MadDat}. The aim is to minimise
+%	\begin{align*}
+%		F(\theta) = \frac{1}{2000}\sum_{i}\log\brk{1+\sum_jy_ix_{ij}\theta_j}+\frac{\lambda}{2}\norm{\theta}^2
+%	\end{align*}
+%	with gradient descent, i.e.\
+%	\begin{align*}
+%		f\colon \R^{500}\to\R^{500}, \quad \theta\mapsto\theta-\alpha\nabla F(\theta)
+%	\end{align*}
+%	for some $\alpha$.
+%\end{frame}
+%
+%\begin{frame}
+%	\begin{figure}
+%		\centering
+%		{\scriptsize
+%		\input{../Plots/method_comparison_GD.pgf}
+%		}
+%		\caption{Residual norms for the logistic regression problem.}
+%	\end{figure}
+%\end{frame}
+%
+%\begin{frame}
+%	\begin{figure}
+%		\centering
+%		{\scriptsize
+%		\input{../Plots/memory_comparison_GD.pgf}
+%		}
+%		\caption{Residual norms for the logistic regression problem.}
+%	\end{figure}
+%\end{frame}
+%
+%\subsection{Facility location}
+%
+%\begin{frame}
+%	\frametitle{Facility location}
+%	The aim is to minimise
+%	\begin{align*}
+%		F\colon \R^{300}\to\R, \quad y\mapsto \sum_{i=1}^{500}\norm{y-c_i}
+%	\end{align*}
+%	for $c_i\in\R^{300}$ with sparsity $0.01$. This can lead to the formulation
+%	\begin{align*}
+%		\tilde{f}\colon \R^{500\times 300}\to\R^{500\times 300}, \quad
+%		z\mapsto \brk*{z_i+2\tikzmark{avg_x_dest}{\avg{x}}-\tikzmark{xi_dest}{x_i}-\avg{z}}_i
+%	\end{align*}
+%	with
+%	\begin{align*}
+%		\tikzmark{avg_x_source}{\avg{x}} = \frac{1}{500}\sum_ix_i \qquad \tikzmark{xi_source}{x_i} = \tikzmark{prox_dest}{\prox_{\norm{\cdot}}}\brk*{z_i+c_i}-c_i
+%	\end{align*}
+%	and
+%	\begin{align*}
+%		\tikzmark{prox_source}{\prox_{\norm{\cdot}}}(v) = \brk*{1-\frac{1}{\norm{v}}}_+v\,.
+%	\end{align*}
+%	\tikzset{external/export=false}
+%	\begin{tikzpicture}[remember picture, overlay, node distance = 0.5cm]
+%		\draw[,->,thick] (avg_x_source) to [in=-125,out=60] (avg_x_dest);
+%		\draw[,->,thick] (xi_source) to [in=-90,out=60] (xi_dest);
+%%		\draw[,->,thick] (prox_source) to [in=-90,out=60] (prox_dest);
+%	\end{tikzpicture}%
+%\end{frame}
+%
+%
+%\begin{frame}
+%	\begin{figure}
+%		\centering
+%		{\scriptsize
+%		\input{../Plots/method_comparison_CO.pgf}
+%		}
+%		\caption{Residual norms for the facility location problem.}
+%	\end{figure}
+%\end{frame}
+%
+%
+%\begin{frame}
+%	\begin{figure}
+%		\centering
+%		{\scriptsize
+%		\input{../Plots/memory_comparison_CO.pgf}
+%		}
+%		\caption{Residual norms for the facility location problem.}
+%	\end{figure}
+%\end{frame}
 
 \subsection{Elastic net regression}
 
@@ -756,6 +905,6 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\end{center}
 \end{frame}
 
-\frame[plain]
+%\frame[plain]
 
 \end{document}

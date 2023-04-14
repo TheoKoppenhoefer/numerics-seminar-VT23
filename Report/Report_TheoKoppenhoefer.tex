@@ -11,6 +11,7 @@
 \author{Theo Koppenhöfer}
 \date{Lund \\[1ex] \today}
 
+\addbibresource{bibliography.bib}
 
 %%%%% The content starts here %%%%%%%%%%%%%
 
@@ -20,4 +21,128 @@
 \maketitle
 
 
+\begin{proof}
+	The proof follows \cite{ZhaAA}[Theorem 6].
+	We partition $\N=K_{AA}\sqcup K_{KM}$ where $K_{AA}=\brk[c]{k_0,k_1,\dots}$ denote the indices $k$ where the algorithm chose an AA-step (a) and $K_{KM}=\brk[c]{l_0,l_1,\dots}$ where the algorithm chose a KM-step (b).
+	
+	\begin{center}
+	\SetAlgoSkip{bigskip}
+	\DontPrintSemicolon
+	\begin{algorithm}[H]
+		\uIf{$\norm{g_k}\leq D\barU(n_{AA}+1)^{-(1+\e)}$}{
+			Set $x_{k+1}=\tix_{k+1}$ and $n_{AA}= n_{AA}+1$. \brkcomment*[r]{a}
+		}
+		\Else{
+			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$. \brkcomment*[r]{b}
+		}
+	\caption{The two cases for $x_{k+1}$.}
+	\end{algorithm}
+	\end{center}
+	Let $y$ be a fixed point. We distinguish
+	\begin{description}
+		\item[case (1)]
+		$k\in K_{AA}$ then
+		\newconstant{upperHk}
+		\newconstant{CDU}
+		\begin{equation}
+		\begin{aligned}
+			\norm{x_{k+1}-y}&\leq \norm{x_k-y}+\norm{H_kg_k} \\
+			&\leq \norm{x_k-y}+\useconstant{upperHk}\norm{g_k} \\
+			&\leq \norm{x_k-y}+\useconstant{CDU}(k+1)^{-(1+\e)}
+			\label{eq:16}
+		\end{aligned}
+		\end{equation}
+		\item[case (2)]
+		$k\in K_{KM}$ then (motivate this)
+		\begin{align}
+			\norm{x_{k+1}-y}^2\leq \norm{x_k-y}^2-\alpha(1-\alpha)\norm{g_k}^2\leq \norm{x_k-y}^2
+			\label{eq:17}
+		\end{align}
+	\end{description}
+	Hence in any case
+	\newconstant{E}
+	\begin{align*}
+		\norm{x_k-y}
+		&\leq \norm{x_0-y}+\sum_{l=0}^{k-1}\norm{x_{l+1}-x_l} \\
+		&\leq \norm{x_0-y}+\useconstant{CDU}\sum_k(k+1)^{-(1+\e)}
+		= \useconstant{E}<\infty\,.
+	\end{align*}
+	It then follows that
+	\begin{equation}
+	\begin{aligned}
+		a_{k+1} &= \norm{x_{k+1}-y}^2 \\
+		&\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq} \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\underbrace{\norm{x_k-y}}_{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
+		&= a_k+b_k
+	\end{aligned}
+	\label{eq:19}
+	\end{equation}
+	and hence
+	\begin{align*}
+		\alpha(1-\alpha)\sum_i\norm{g_{l_i}}^2
+		\stackrel{\eqref{eq:17}}{\leq} \sum_i a_{l_i}-a_{l_i+1}
+		\stackrel{\eqref{eq:19}}{\leq}a_0+\sum_k b_k
+		<\infty
+	\end{align*}
+	We therefore have $\lim_i\norm{g_{l_i}}=0$. It also follows from $\norm{g_{k_i}}\leq D\barU (i+1)^{-(1+\e)}$ that $\lim_i\norm{g_{k_i}}=0$. Thus indeed $\lim_k\norm{g_k}=0$.
+	
+	(part 2)
+	Let now $n_j$ and  $N_j\geq n_j$ be such that
+	\begin{align*}
+		a_{n_j}\xrightarrow{j\to\infty}\liminf_ka_k=\underline{a} \\
+		a_{N_j}\xrightarrow{j\to\infty}\limsup_ka_k=\overline{a}	
+	\end{align*}
+	Then it follows that
+	\begin{align*}
+		\overline{a}-\underline{a}
+		\xleftarrow{n_j\to\infty}\overline{a}-a_{n_j}
+		\xleftarrow{N_j\to\infty}a_{N_j}-a_{n_j}
+		= \sum_{k=n_j}^{N_j-1}a_{k+1}-a_k
+		\leq \sum_{k=n_j}^\infty b_k
+		\xrightarrow{n_j\to\infty}0
+	\end{align*}
+	so
+	\begin{align*}
+		\limsup_ka_k=\overline{a}\leq \underline{a}=\liminf_ka_k
+	\end{align*}
+	and thus $a_k=\norm{x_k-y}$ converges to some $b$.
+	
+	(part 3)
+	Let $k_j$ and $l_j$ be convergent subsequences of $x_k$ convergent against $y_1$ and $y_2$ respectively. Since by continuity of $g$
+	\begin{align*}
+		\norm{g(y_1)}=\lim_j\norm{g(x_{k_j})}=0
+	\end{align*}
+	we have that $y_1$ is a fixed point and $y_2$ too.
+	Now
+	\begin{align*}
+		\norm{y_1} 
+		\xleftarrow{j\to\infty} \norm{x_{k_j}}^2
+		= \norm{x_k-y}^2+\norm{y}^2+2y^\top x_{k_j}
+		\xrightarrow{j\to\infty} b^2+\norm{y}^2+2y^\top y_1
+	\end{align*}
+	and analogously for $y_2$. Thus
+	\begin{align*}
+		\norm{y_i}=b^2+\norm{y}^2+2y^\top y_i
+	\end{align*}
+	which implies
+	\begin{align*}
+		2y^\top(y_1-y_2) = \norm{y_1}^2-\norm{y_2}^2
+	\end{align*}
+	It then follows from $y\in\brk[c]{y_i}_i$ that
+	\begin{align*}
+		y_1^\top(y_1-y_2) = y_2^\top(y_1-y_2)
+	\end{align*}
+	and further
+	\begin{align*}
+		(y_1-y_2)^\top(y_1-y_2) = 0
+	\end{align*}
+	and thus $y_1=y_2$. We have shown that two convergent subsequences have the same limit and hence $x_k$ is convergent and the solution must be a fixed point of $f$.
+\end{proof}
+
+
+\newpage
+\section*{Sources}
+\nocite{*}
+%	\bibliographystyle{plain}
+%	\bibliography{bibliography}
+\printbibliography
 \end{document}

@@ -30,7 +30,10 @@
 %\usepackage{algorithm}
 %\usepackage{algpseudocode}
 \usepackage{algorithm2e}
-\RestyleAlgo{algoruled}
+\SetAlgoSkip{medskip} % bigskip
+\DontPrintSemicolon
+%\RestyleAlgo{algoruled} % ruled, plain
+\SetKwComment{brkcomment}{(}{)}
 
 \usepackage[backend=bibtex, style=ieee]{biblatex}
 %\usepackage{biblatex}
