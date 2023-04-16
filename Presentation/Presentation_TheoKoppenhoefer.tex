@@ -41,11 +41,12 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\end{problem}
 	We also assume
 	\begin{itemize}
-		\item $f$ is nonexpansive, i.e.\ $\norm{f(x)-f(y)}\leq\norm{x-y}$
+		\item $f$ has a fixed point.
+		\item $f$ is nonexpansive, i.e.\ $\norm{f(x)-f(y)}\leq\norm{x-y}$.
 		\item $n$ is large \textrightarrow matrix-free
 		\item $\nabla f$ is unknown \textrightarrow no Newton
-		\item cost of evaluation of $f$ is high \textrightarrow no line search
 		\item noisy problem \textrightarrow no finite difference derivatives
+		\item cost of evaluating $f$ is high \textrightarrow no line search
 	\end{itemize}
 \end{frame}
 
@@ -95,7 +96,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
 	\BlankLine
 	\For{$k=0,1,\dots$}{
-		{\color{black}
+		{\black
 		Set $f_k =f\brk*{x_k}$.
 		
 		Choose $\alpha = \alpha^k\in \R^{k}$ such that $\sum_i\alpha_i=1$.
@@ -111,7 +112,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \begin{frame}
 	\frametitle{AA-II}
 %	\IncMargin{1em}
-	Since finding a fixed point of $f$ is equivalent to finding a zero of $g=\Id-f$ we have the ansatz
+	Since finding a fixed point of $f$ is equivalent to finding a zero of $g=\Id-f$ the following seems like a good idea
 	
 	\begin{figure}
 	\begin{algorithm}[H]
@@ -123,9 +124,9 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\For{$k=0,1,\dots$}{
 	  Set $f_k =f\brk*{x_k}$.
 	  
-	  {\color{black}Set $g_k = x_k-f_k$.}
+	  {\black Set $g_k = x_k-f_k$.}
 	  
-	  Choose $\alpha\in \R^{k}$ such that $\sum_i\alpha_i=1$ {\color{black} and such that $\alpha$ minimises $\norm{\sum_i\alpha_ig_i}_2$}.
+	  Choose $\alpha\in \R^{k+1}$ such that $\sum_i\alpha_i=1$ {\black and such that $\alpha$ minimises $\norm{\sum_i\alpha_ig_i}_2$}.
 	  
 	 Set $x_{k+1} = \sum_i \alpha_if_{i}$.
 	}
@@ -133,70 +134,71 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\end{figure}
 \end{frame}
 
-\begin{frame}
-	\frametitle{Rewriting AA-II}
-	Setting 
-	\begin{align*}
-		\alpha=\vect{\gamma_0 \\ \gamma_1-\gamma_0 \\ \vdots \\ \gamma_{k}-\gamma_{k-1} \\ 1-\gamma_k}
-		\text{ and }
-		Y_k = \begin{bmatrix}
-			& & \\
-			g_{1}-g_0 & \cdots & g_{k}-g_{k-1} \\
-			& &
-		\end{bmatrix} \in\R^{n\times k}
-	\end{align*}
-	one obtains the least squares problem
-	\begin{align*}
-		\min_{\substack{\alpha\in\R^{k+1} \\ \sum_i\alpha_i=1}}\norm2{\sum_i\alpha_ig_i}
-		= \min_{\gamma \in\R^k}\norm{g_k-Y_k\gamma}
-	\end{align*}
-	which is solved by
-	\begin{align*}
-		\gamma= \gamma^k = \brk*{Y_k^\top Y_k}^{-1}Y_k^\top g_k\,.
-	\end{align*}
-\end{frame}
+%\begin{frame}
+%	\frametitle{Rewriting AA-II}
+%	Setting 
+%	\begin{align*}
+%		\alpha=\vect{\gamma_0 \\ \gamma_1-\gamma_0 \\ \vdots \\ \gamma_{k}-\gamma_{k-1} \\ 1-\gamma_k}
+%		\text{ and }
+%		Y_k = \begin{bmatrix}
+%			& & \\
+%			g_{1}-g_0 & \cdots & g_{k}-g_{k-1} \\
+%			& &
+%		\end{bmatrix} \in\R^{n\times k}
+%	\end{align*}
+%	one obtains the least squares problem
+%	\begin{align*}
+%		\min_{\substack{\alpha\in\R^{k+1} \\ \sum_i\alpha_i=1}}\norm2{\sum_i\alpha_ig_i}
+%		= \min_{\gamma \in\R^k}\norm{g_k-Y_k\gamma}
+%	\end{align*}
+%	which is solved by
+%	\begin{align*}
+%		\gamma= \gamma^k = \brk*{Y_k^\top Y_k}^{-1}Y_k^\top g_k\,.
+%	\end{align*}
+%\end{frame}
+%
+%\begin{frame}
+%	If we now set
+%	\begin{align*}
+%		S_k = \begin{bmatrix}
+%			& & \\
+%			x_1-x_0 & \cdots & x_{k}-x_{k-1} \\
+%			& & \\
+%		\end{bmatrix} \in\R^{n\times k}
+%	\end{align*}
+%	we see that
+%	\begin{align*}
+%		S_k -Y_k &= \begin{bmatrix}
+%			& & \\
+%			x_1-x_0-(g_1-g_0) & \cdots & x_{k}-x_{k-1}-(g_{k}-g_{k-1}) \\
+%			& & \\
+%		\end{bmatrix} \\
+%		&= \begin{bmatrix}
+%			& & \\
+%			f_1-f_0 & \cdots & f_k-f_{k-1} \\
+%			& & \\
+%		\end{bmatrix}
+%	\end{align*}
+%\end{frame}
+%
+%\begin{frame}
+%	and hence
+%	\begin{align*}
+%		x_{k+1} &= \sum_i\alpha_if_i \\
+%		&= f_k -(S_k-Y_k)\gamma \\ \\
+%		&\tikzmark{def_gamma}{=} x_k -\underbrace{\brk*{\Id+(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top}}_{=H_k}g_k \\
+%		&= x_k -H_kg_k\,.
+%	\end{align*}
+%	\tikzset{external/export=false}
+%	\begin{tikzpicture}[remember picture, overlay, node distance = 0.3cm]
+%		\node[,text width=10cm] (def_gamma_descr) [above right=0.2cm and 0.1cm of def_gamma]{$f_k=x_k-g_k$ and $\gamma=\brk*{Y_k^\top Y_k}^{-1}Y_k^\top$};
+%		\draw[,->,thick] (def_gamma_descr) to [in=90,out=180] (def_gamma);
+%	\end{tikzpicture}%
+%\end{frame}
 
 \begin{frame}
-	If we now set
-	\begin{align*}
-		S_k = \begin{bmatrix}
-			& & \\
-			x_1-x_0 & \cdots & x_{k}-x_{k-1} \\
-			& & \\
-		\end{bmatrix} \in\R^{n\times k}
-	\end{align*}
-	we see that
-	\begin{align*}
-		S_k -Y_k &= \begin{bmatrix}
-			& & \\
-			x_1-x_0-g_0+g_1 & \cdots & x_{k}-x_{k-1}-g_{k}+g_{k-1} \\
-			& & \\
-		\end{bmatrix} \\
-		&= \begin{bmatrix}
-			& & \\
-			f_1-f_0 & \cdots & f_k-f_{k-1} \\
-			& & \\
-		\end{bmatrix}
-	\end{align*}
-\end{frame}
-
-\begin{frame}
-	and hence
-	\begin{align*}
-		x_{k+1} &= \sum_i\alpha_if(x_i) \\
-		&= f_k -(S_k-Y_k)\gamma \\ \\
-		&\tikzmark{def_gamma}{=} x_k -\underbrace{\brk*{\Id+(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top}}_{=H_k}g_k \\
-		&= x_k -H_kg_k\,.
-	\end{align*}
-	\tikzset{external/export=false}
-	\begin{tikzpicture}[remember picture, overlay, node distance = 0.3cm]
-		\node[,text width=10cm] (def_gamma_descr) [above right=0.2cm and 0.1cm of def_gamma]{$f_k=x_k-g_k$ and $\gamma=\brk*{Y_k^\top Y_k}^{-1}Y_k^\top$};
-		\draw[,->,thick] (def_gamma_descr) to [in=90,out=180] (def_gamma);
-	\end{tikzpicture}%
-\end{frame}
-
-\begin{frame}
-	We thus have the reformulation
+	\frametitle{AA-II (reformulated)}
+	One can show that this can be brought into the form of a quasi-Newton-like method
 	\begin{figure}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
@@ -205,12 +207,12 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\color{gray}
 	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
 	\BlankLine
-	{\color{black}Set $x_1 =f(x_0)$.}
+	{\black Set $x_1 =f(x_0)$.}
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_k)$.
 		
-		{\color{black}Construct $S_k$ from $x_0,\dots, x_k$ and $Y_k$ from $g_0,\dots,g_k$.
+		{\black Construct $S_k=\vect{x_1-x_0 &\cdots& x_{k}-x_{k-1}}\in\R^{n\times k}$ and $Y_k=\vect{g_1-g_0 &\cdots& g_k-g_{k-1}}\in\R^{n\times k}$.
 		
 		Set $H_k = \Id +(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top$.
 %		$s_{k-1}= x_k-x_{k-1}$ and
@@ -257,7 +259,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 		
 		Construct $S_k$ from $x_0,\dots, x_k$ and $Y_k$ from $g_0,\dots,g_k$.
 				
-		{\color{black}Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top$.
+		{\black Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top$.
 		
 		Set $H_k = B_k^{-1}$.}
 %		$s_{k-1}= x_k-x_{k-1}$ and
@@ -267,6 +269,16 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	}
 	\end{algorithm}
 	\end{figure}
+\end{frame}
+
+\begin{frame}
+	But this algorithm has some problems
+	\begin{itemize}
+		\item computational efficiency: the approach is not matrix-free, we have to solve a linear system \textrightarrow rank-1 update for $B_k$ and later $H_k$
+		\item well-definedness of $H_k$: $B_k$ might not be well-defined or singular \textrightarrow Powell-type regularisation, restarting iteration
+		\item memory usage: though infinite memory is nice to have it is not very realistic \textrightarrow restarting iteration
+		\item convergence: the algorithm does not necessarily converge \textrightarrow safeguarding steps
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -285,21 +297,6 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \end{frame}
 
 \begin{frame}
-	From the Sherman-Morrison formula it then follows that
-	\begin{proposition}[Rank-1 update for $H_k$]
-		We have
-		\begin{align*}
-			H_{k+1} = H_k+\frac{\brk*{s_k-H_ky_k}\hs_k^\top H_k}{\hs_k^\top H_ky_k}
-		\end{align*}
-		where $y_k = g_{k+1}-g_k$, $H_0=\Id$ and
-		\begin{align*}
-			\hs_k = s_k-\sum_{j=0}^{k-1}\frac{\hs_k^\top s_k}{\norm{\hs_k}^2}\hs_k
-		\end{align*}
-		is the Gram-Schmidt orthogonalisation of $s_k=x_{k+1}-x_k$.
-	\end{proposition}
-\end{frame}
-
-\begin{frame}
 	Taking everything together we obtain
 	\begin{figure}
 %	\IncMargin{1em}
@@ -309,80 +306,42 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\color{gray}
 	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
 	\BlankLine
-	Set {\color{black}$H_0=\Id$} and $x_1=f\brk{x_0}$.
+	Set {\black$B_0=\Id$} and $x_1=f\brk{x_0}$.
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$.
 		
-		{\color{black}
+		{\black
 		Set $s_{k-1}= x_k-x_{k-1}$,
 		$y_{k-1}= g_k-g_{k-1}$ and
 		$\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
 		
-		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}y_{k-1})s_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}y_{k-1}}$.}
+		Set $B_k = B_{k-1}+\frac{\brk*{y_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.}
 		
-		Set  $x_{k+1}= x_k-H_kg_k$.
+		Set $H_k=B_k^{-1}$.
+		
+		Set $x_{k+1}= x_k-H_kg_k$.
 		
 	}
 	\end{algorithm}
 	\end{figure}
 \end{frame}
 
+
 \section{Modifications to AA-I}
 \subsection{Powell-type regularisation}
 
 \begin{frame}	
 	\frametitle{Powell-type regularisation}
-	Note that $B_k$ may be singular. To fix this set
-	\begin{align*}
-		\tiy_k=\theta_ky_k+(1-\theta_k)B_ks_k
-	\end{align*}
-	or equivalently
-	\begin{align*}
-		\tiy_k=\theta_ky_k+(1-\theta_k)B_ks_k
-	\end{align*}
-	where
-	\begin{align*}
-		\theta_k = \tikzmark{phi_dest}{\phi_{\bartheta}}(\tikzmark{eta_dest}{\eta_k})
-	\end{align*}
-	with
-	\begin{align*}
-		\tikzmark{phi_source}{\phi_{\bartheta}}(\eta) = \begin{cases}
-			\frac{1-\sgn(\eta)\bartheta}{1-\eta} &\text{ if }\abs{\eta}<\bartheta \\
-			1 &\text{ else }
-		\end{cases} \quad\text{ and }\quad
-		\tikzmark{eta_source}{\eta_k} = \frac{\hs_k^\top H_ky_k}{\norm{\hs_k}^2}
-	\end{align*}	
-	\tikzset{external/export=false}
-	\begin{tikzpicture}[remember picture, overlay, node distance = 1cm]
-		\draw[,->,thick] (phi_source) to [in=-90,out=90] (phi_dest);
-		\draw[,->,thick] (eta_source) to [in=-90,out=90] (eta_dest);
-	\end{tikzpicture}%
-\end{frame}
-
-\begin{frame}
-	One can obtain
-	\begin{lemma}[Powell-type regularisation]
-		Let $s_k\in\R^n$, $B_0=\Id$, and inductively
-		\begin{align*}
-			B_{k+1} = B_k+\frac{\brk{\tiy_k-B_ks_k}\hs_k^\top}{\hs_k^\top s_k}
-		\end{align*}
-		with $\hs_k$ and $\tiy_k$ defined as before. If this is well-defined then $\abs{\det\brk{B_k}}\geq \theta^k>0$ and $B_k$ is invertible.
-	\end{lemma}
-	\begin{proof}
-		See \cite[Lemma 2]{ZhaAA}.
-	\end{proof}
-\end{frame}
-
-\begin{frame}
-%	\IncMargin{1em}
+	Note that $B_k$ may be singular. To fix this we use powell-type regularisation.
+%	\begin{center}
 	\begin{algorithm}[H]
-	\caption{AA-I with Powell-like-regularisation}\label{alg:aa1-p}
+	\caption{AA-I with Powell-type regularisation}\label{alg:aa1-p}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
 s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\BlankLine
-	Set $H_0=\Id$ and $x_1=f\brk{x_0}$.
+	Set $B_0=\Id$ and $x_1=f\brk{x_0}$.
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$,
@@ -392,15 +351,30 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		Set $\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
 		
 		{\black
-		Set $\eta_{k-1}= \frac{\hs_{k-1}^\top H_{k-1}y_{k-1}}{\norm{\hs_{k-1}}^2}$, 
-		$\theta_{k-1}=\phi_{\bartheta}(\eta_{k-1})$
-		and $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		Choose $\theta_{k-1}$ in dependence of $\bartheta$.
+		
+		Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
 		}
 		
-		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $x_{k+1}= x_k-H_kg_k$.
+		Set $B_k = B_{k-1}+\frac{\brk*{{\black\tiy_{k-1}}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.
+		
+		Set $H_k=B_k^{-1}$.
+		
+		Set $x_{k+1}= x_k-H_kg_k$.
 		
 	}
-	\end{algorithm}
+	\end{algorithm}	
+%	\end{center}
+\end{frame}
+
+\begin{frame}
+	One can obtain
+	\begin{lemma}[Powell-type regularisation]
+		If $B_k$ is well-defined in algorithm \ref{alg:aa1-p} we have that $B_k$ is invertible and $$\abs{\det B_k}\geq \theta^k\,.$$
+	\end{lemma}
+	\begin{proof}
+		See \cite[Lemma 2]{ZhaAA}.
+	\end{proof}
 \end{frame}
 
 \subsection{Restarting iteration}
@@ -419,12 +393,12 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \begin{frame}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
-	\caption{AA-I with Powell-like-regularisation and Restarting}\label{alg:aa1-pr}
+	\caption{AA-I with Powell-type regularisation and Restarting}\label{alg:aa1-pr}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
-	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\color{black}$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\black$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
 	\BlankLine
-	Set $H_0=\Id$, $x_1=f\brk{x_0}$ and {\color{black} $m_0 = 0$}.
+	Set $B_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$,
@@ -436,24 +410,29 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		
 		{\black
 		\If{$m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$}{
-			Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $H_{k-1}=\Id$.
+			Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $B_{k-1}=\Id$.
 		}
 		}
-		Set $\eta_{k-1}= \frac{\hs_{k-1}^\top H_{k-1}y_{k-1}}{\norm{\hs_{k-1}}^2}$, 
-		$\theta_{k-1}=\phi_{\bartheta}(\eta_{k-1})$
-		and $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		Choose $\theta_{k-1}$ in dependence of $\bartheta$.
 		
-		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $x_{k+1}= x_k-H_kg_k$.
+		Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		
+		Set $B_k = B_{k-1}+\frac{\brk*{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.
+		
+		Set $H_k=B_k^{-1}$.
+		
+		Set $x_{k+1}= x_k-H_kg_k$.
 		
 	}
 	\end{algorithm}
 \end{frame}
 
 \begin{frame}
+	\newconstant{BkUpperBound}
 	\begin{lemma}[Restarting iteration]
-		If we additionally choose $m_k$ by the rule above we have
+		In algorithm \ref{alg:aa1-pr} we have that $B_k$ is well-defined and there exists a constant $\useconstant{BkUpperBound}=\useconstant{BkUpperBound}(m,\bartheta,\tau)>0$ such that
 		\begin{align*}
-			\norm{B_k}\leq 3\brk*{\frac{1+\bartheta+\tau}{\tau}}^m-2\,.
+			\norm{B_k}\leq \useconstant{BkUpperBound}\,.
 		\end{align*}
 	\end{lemma}
 	\begin{proof}
@@ -462,10 +441,58 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \end{frame}
 
 \begin{frame}
-	\begin{lemma}[bound on $\norm{H_k}_2$]
-		In algorithm \ref{alg:aa1-pr} we have that
+	From the Sherman-Morrison formula one can obtain
+	\begin{proposition}[Rank-1 update for $H_k$]
+		We have
 		\begin{align*}
-			\norm{H_k}_2\leq \frac{1}{\bartheta^m}\brk*{3\brk*{\frac{1+\bartheta+\tau}{\tau}}^m-2}^{n-1}\,.
+			H_{k+1} = H_k+\frac{\brk*{s_k-H_ky_k}\hs_k^\top H_k}{\hs_k^\top H_ky_k}
+		\end{align*}
+	\end{proposition}
+\end{frame}
+
+
+\begin{frame}
+%	\IncMargin{1em}
+	\begin{algorithm}[H]
+	\caption{AA-I with Powell-type regularisation and Restarting}\label{alg:aa1-pr}
+	\SetKwInOut{Input}{Input}
+	\color{gray}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\black$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
+	\BlankLine
+	Set $H_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
+	
+	\For{$k=0,1,\dots$}{
+		Set $g_k= g(x_{k})$,
+		$m_k= m_{k-1}+1$, 
+		$s_{k-1}= x_k-x_{k-1}$ and
+		$y_{k-1}= g_k-g_{k-1}$.
+		
+		Set $\hs_{k-1}= s_{k-1}-\sum_{i=k-m_k}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
+		
+		\If{$m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$}{
+			Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $H_{k-1}=\Id$.
+		}
+		
+		Choose $\theta_{k-1}$ in dependence of $\bartheta$.
+		
+		Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		
+		{\black
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$.
+		}
+		
+		Set $x_{k+1}= x_k-H_kg_k$.
+		
+	}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\newconstant{upperHk}
+	\begin{lemma}[bound on $\norm{H_k}_2$]
+		In algorithm \ref{alg:aa1-pr} there exists $\useconstant{upperHk}=\useconstant{upperHk}(m,n, \bartheta,\tau)>0$ such that
+		\begin{align*}
+			\norm{H_k}_2\leq \useconstant{upperHk}\,.
 		\end{align*}
 	\end{lemma}
 	\begin{proof}
@@ -486,7 +513,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\frametitle{Safeguarding steps}
 	To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnosel'skii-Mann steps which are given by
 	\begin{align*}
-		x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)
+		x_{k+1}= (1-\alpha)x_k +\alpha f_k
 	\end{align*}
 	for some fixed $\alpha\in(0,1)$.
 \end{frame}
@@ -496,12 +523,12 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \begin{frame}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
-	\caption{AA-I with Powell-like-regularisation, Restarting and Safeguarding}\label{alg:aa1-prs}
+	\caption{AA-I with Powell-type regularisation, Restarting and Safeguarding}\label{alg:aa1-prs}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
-	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$,$m \in\N$, $\bartheta, \tau, {\color{black}\alpha}\in(0,1)$ and {\color{black}safe-guarding constants $D,\e>0$}}
+	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$,$m \in\N$, $\bartheta, \tau, {\black\alpha}\in(0,1)$ and {\black safe-guarding constants $D,\e>0$}}
 	\BlankLine
-	Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\color{black}n_{AA}=0}$ and ${\color{black}\barU=\norm{g_0}_2}$.
+	Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\black n_{AA}=0}$ and ${\black\barU=\norm{g_0}_2}$.
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$,
@@ -514,18 +541,18 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		\If{$m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$}{
 			Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $H_{k-1}=\Id$.
 		}
-		Set $\eta_{k-1}= \frac{\hs_{k-1}^\top H_{k-1}y_{k-1}}{\norm{\hs_{k-1}}^2}$, 
-		$\theta_{k-1}=\phi_{\bartheta}(\eta_{k-1})$
-		and $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
+		Choose $\theta_{k-1}$ in dependence of $\bartheta$.
+		
+		Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
 		
 		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $\tix_{k+1}= x_k-H_kg_k$.
 		
-		{\color{black}
+		{\black
 		\uIf{$\norm{g_k}\leq D\barU(n_{AA}+1)^{-(1+\e)}$}{
 			Set $x_{k+1}=\tix_{k+1}$ and $n_{AA}= n_{AA}+1$.
 		}
 		\Else{
-			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$.
+			Set $x_{k+1}= (1-\alpha)x_k +\alpha f_k$.
 		}
 		}
 	}
@@ -557,10 +584,13 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 %\end{frame}
 
 \begin{frame}
+	\begin{proofs}[Proof, strategy]
+	\vspace*{1cm}
 	\centering
 	\scalebox{0.9}{
 	\input{../Figures/Diagram_002}
 	}
+	\end{proofs}
 \end{frame}
 
 \begin{frame}
@@ -574,7 +604,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 			Set $x_{k+1}=\tix_{k+1}$ and $n_{AA}= n_{AA}+1$. \brkcomment*[r]{a}
 		}
 		\Else{
-			Set $x_{k+1}= (1-\alpha)x_k +\alpha f(x_k)$. \brkcomment*[r]{b}
+			Set $x_{k+1}= (1-\alpha)x_k +\alpha f_k$. \brkcomment*[r]{b}
 		}
 	\caption{The two cases for $x_{k+1}$.}
 	\end{algorithm}
@@ -589,7 +619,6 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{description}
 		\item[case (a)]
 		$k\in K_{AA}$ then
-		\newconstant{upperHk}
 		\newconstant{CDU}
 		\begin{equation}
 		\begin{aligned}
@@ -600,9 +629,9 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		\end{aligned}
 		\end{equation}
 		\item[case (b)]
-		$k\in K_{KM}$ then (motivate this)
+		$k\in K_{KM}$ then as $f$ is nonexpansive (motivate this)
 		\begin{align}
-			\norm{x_{k+1}-y}^2\leq \norm{x_k-y}^2-\alpha(1-\alpha)\norm{g_k}^2\leq \norm{x_k-y}^2
+			\norm{x_{k+1}-y}^2\leq \norm{x_k-y}^2-\alpha(1-\alpha)\norm{g_k}^2
 			\label{eq:17}
 		\end{align}
 	\end{description}
@@ -610,8 +639,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\newconstant{E}
 	\begin{align*}
 		\norm{x_k-y}
-		&\leq \norm{x_0-y}+\sum_{l=0}^{k-1}\norm{x_{l+1}-x_l} \\
-		&\leq \norm{x_0-y}+\useconstant{CDU}\sum_k(k+1)^{-(1+\e)}
+		\leq \norm{x_0-y}+\useconstant{CDU}\sum_k(k+1)^{-(1+\e)}
 		= \useconstant{E}<\infty\,.
 	\end{align*}
 	\end{proofs}
@@ -623,8 +651,8 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	It then follows that
 	\begin{equation}
 	\begin{aligned}
-		a_{k+1} &= \norm{x_{k+1}-y}^2 \\
-		&\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq} \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\underbrace{\norm{x_k-y}}_{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
+		a_{k+1} &= \norm{x_{k+1}-y}^2\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq}\brk*{\norm{x_k-y}+\useconstant{CDU}(k+1)^{-(1+\e)}}^2 \\
+		&\leq \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\underbrace{\norm{x_k-y}}_{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
 		&= a_k+b_k
 	\end{aligned}
 	\label{eq:19}
@@ -654,14 +682,14 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		\xleftarrow{n_j\to\infty}\overline{a}-a_{n_j}
 		\xleftarrow{N_j\to\infty}a_{N_j}-a_{n_j}
 		= \sum_{k=n_j}^{N_j-1}a_{k+1}-a_k
-		\leq \sum_{k=n_j}^\infty b_k
+		\stackrel{\eqref{eq:19}}{\leq} \sum_{k=n_j}^\infty b_k
 		\xrightarrow{n_j\to\infty}0
 	\end{align*}
 	so
 	\begin{align*}
 		\limsup_ka_k=\overline{a}\leq \underline{a}=\liminf_ka_k
 	\end{align*}
-	and thus $a_k=\norm{x_k-y}$ converges to some $b$.
+	and thus $a_k=\norm{x_k-y}$ converges to some $a$.
 	\end{proofs}
 \end{frame}
 
@@ -670,19 +698,19 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{proofs}[Proof, part 3.]
 	Let $k_j$ and $l_j$ be convergent subsequences of $x_k$ convergent against $y_1$ and $y_2$ respectively. Since by continuity of $g$
 	\begin{align*}
-		\norm{g(y_1)}=\lim_j\norm{g(x_{k_j})}=0
+		\norm{g(y_1)}=\lim_j\norm{g(x_{k_j})}\stackrel{\text{part 1}}{=}0
 	\end{align*}
 	we have that $y_1$ is a fixed point and $y_2$ too.
-	Now
+	Now by part 2
 	\begin{align*}
 		\norm{y_1} 
 		\xleftarrow{j\to\infty} \norm{x_{k_j}}^2
-		= \norm{x_k-y}^2+\norm{y}^2+2y^\top x_{k_j}
-		\xrightarrow{j\to\infty} b^2+\norm{y}^2+2y^\top y_1
+		= \norm{x_{k_j}-y}^2+\norm{y}^2+2y^\top x_{k_j}
+		\xrightarrow{j\to\infty} a+\norm{y}^2+2y^\top y_1
 	\end{align*}
 	and analogously for $y_2$. Thus
 	\begin{align*}
-		\norm{y_i}=b^2+\norm{y}^2+2y^\top y_i
+		\norm{y_i}=a+\norm{y}^2+2y^\top y_i
 	\end{align*}
 	which implies
 	\begin{align*}
@@ -702,7 +730,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		(y_1-y_2)^\top(y_1-y_2) = 0
 	\end{align*}
-	and thus $y_1=y_2$. We have shown that two convergent subsequences have the same limit and hence $x_k$ is convergent and the solution must be a fixed point of $f$.
+	and thus $y_1=y_2$. We have shown that two convergent subsequences have the same limit and hence $x_k$ is convergent and the limit must be a fixed point of $f$.
 	\end{proofs}
 \end{frame}
 
@@ -799,11 +827,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 
 \begin{frame}
 	\frametitle{Elastic net regression}
-	Our aim is to minimise
-	\begin{align*}
-		F\colon \R^{1000}\to \R, \quad x\mapsto \frac{1}{2}\norm{Ax-b}^2+\mu\brk*{\frac{1}{4}\norm{x}^2+\frac{1}{2}\norm{x}_1}
-	\end{align*}
-	with $A\in\R^{500\times 1000}$, $b\in\R^{500}$ and some $\mu\in\R$. From the Iterative Shrinkage-Thresholding Algorithm one obtains
+	The aim is to find a fixed point of
 	\begin{align*}
 		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto S_{\alpha\mu/2}\brk*{x-\alpha\brk*{A^\top(Ax-b)+\frac{\mu}{2}x}}
 	\end{align*}
@@ -811,7 +835,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_i
 	\end{align*}
-	and some $\alpha\in\R$.
+	and $A\in\R^{500\times 1000}$, $b\in\R^{500}$ and some $\alpha, \mu\in\R$.
 \end{frame}
 
 
@@ -841,7 +865,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\frametitle{Markov decision process}
 	Our aim is to find a fixed point of the Bellman operator
 	\begin{align*}
-		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto \brk*{\max_{a}R(s,a)+\gamma \sum_{s'}P(s,a,s')x_{s'}}_{s}
+		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto \brk*{\max_{a} \brk3{ R(s,a)+\gamma \sum_{s'}P(s,a,s')x_{s'}}}_{s}
 	\end{align*}
 	with some $R\in\R^{300\times 200}$, $P\in\R^{300\times 200\times 300}$, $\gamma\in\R$.
 \end{frame}
@@ -853,7 +877,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		{\scriptsize
 		\input{../Plots/method_comparison_VI.pgf}
 		}
-		\caption{Residual norms for the elastic net regression problem.}
+		\caption{Residual norms for the Markov decision process problem.}
 	\end{figure}
 \end{frame}
 
@@ -864,7 +888,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		% \tiny
 		\input{../Plots/memory_comparison_VI.pgf}
 		}
-		\caption{Residual norms for the elastic net regression problem.}
+		\caption{Residual norms for the Markov decision process problem.}
 	\end{figure}
 \end{frame}
 
