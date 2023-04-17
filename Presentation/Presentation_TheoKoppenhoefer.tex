@@ -5,15 +5,15 @@
 %%%%% TITLE PAGE
 
 \subject{, VT23}
-\title{Junzi Zhang, Brendan O'Donoghue, Stephen Boyd: 
-Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iterations}
+\title{Project presentation of \\[1ex]
+{\large Zhang, et al.: Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iterations}}
 %\subtitle{}
 \author{Theo Koppenhöfer}
 \date{Lund \\[1ex] \today}
 
 
 %\SetAlFnt{\small}
-\addbibresource{bibliography.bib}
+\addbibresource{../Presentation/bibliography.bib}
 
 
 
@@ -43,10 +43,10 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\begin{itemize}
 		\item $f$ has a fixed point.
 		\item $f$ is nonexpansive, i.e.\ $\norm{f(x)-f(y)}\leq\norm{x-y}$.
-		\item $n$ is large \textrightarrow matrix-free
 		\item $\nabla f$ is unknown \textrightarrow no Newton
 		\item noisy problem \textrightarrow no finite difference derivatives
 		\item cost of evaluating $f$ is high \textrightarrow no line search
+		\item $n$ is large \textrightarrow matrix-free
 	\end{itemize}
 \end{frame}
 
@@ -99,7 +99,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 		{\black
 		Set $f_k =f\brk*{x_k}$.
 		
-		Choose $\alpha = \alpha^k\in \R^{k}$ such that $\sum_i\alpha_i=1$.
+		Choose $\alpha = \alpha^k\in \R^{k+1}$ such that $\sum_i\alpha_i=1$.
 	  
 		Set $x_{k+1} = \sum_i \alpha_if_{i}$.
 		}
@@ -214,7 +214,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 		
 		{\black Construct $S_k=\vect{x_1-x_0 &\cdots& x_{k}-x_{k-1}}\in\R^{n\times k}$ and $Y_k=\vect{g_1-g_0 &\cdots& g_k-g_{k-1}}\in\R^{n\times k}$.
 		
-		Set $H_k = \Id +(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top$.
+		Set $H_k = \Id +(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top\in\R^{n\times n}$.
 %		$s_{k-1}= x_k-x_{k-1}$ and
 %		$y_{k-1}= g_k-g_{k-1}$.
 		
@@ -236,7 +236,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\begin{definition}[Approximate Jacobian]
 		Let $B_k$ be minimiser of $\norm{B_k-\Id}_F$ under the condition $B_kY_k=S_k$.
 	\end{definition}
-	Analogously to AA-II we have
+	One can show that
 	\begin{align*}
 		B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top\,.
 	\end{align*}
@@ -259,7 +259,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 		
 		Construct $S_k$ from $x_0,\dots, x_k$ and $Y_k$ from $g_0,\dots,g_k$.
 				
-		{\black Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top$.
+		{\black Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top\in\R^{n\times n}$.
 		
 		Set $H_k = B_k^{-1}$.}
 %		$s_{k-1}= x_k-x_{k-1}$ and
@@ -271,33 +271,39 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\end{figure}
 \end{frame}
 
+\section{Modifications to AA-I}
 \begin{frame}
 	But this algorithm has some problems
 	\begin{itemize}
-		\item computational efficiency: the approach is not matrix-free, we have to solve a linear system \textrightarrow rank-1 update for $B_k$ and later $H_k$
+		\item computational efficiency: the approach is not matrix-free \textrightarrow rank-1 update for $B_k$ and later $H_k$
 		\item well-definedness of $H_k$: $B_k$ might not be well-defined or singular \textrightarrow Powell-type regularisation, restarting iteration
 		\item memory usage: though infinite memory is nice to have it is not very realistic \textrightarrow restarting iteration
 		\item convergence: the algorithm does not necessarily converge \textrightarrow safeguarding steps
 	\end{itemize}
 \end{frame}
 
+\subsection{Computational efficiency: Rank-1 update for $B_k$}
+
 \begin{frame}
-	Luckily for us we can save some computations by using the rank-1 update formula
+	\frametitle{Computational efficiency: Rank-1 update for $B_k$}
+	One can show
 	\begin{proposition}[Rank-1 update for $B_k$]
 		We have
 		\begin{align*}
-			B_{k+1} = B_k+\frac{\brk*{y_k-B_ks_k}\hs_k^\top}{\hs_k^\top s_k}
+			B_{k} = B_{k-1}+\frac{\brk*{y_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}
 		\end{align*}
-		where $y_k = g_{k+1}-g_k$, $B_0=\Id$ and
+		where $y_{k-1} = g_{k}-g_{k-1}$, $B_0=\Id$ and
 		\begin{align*}
-			\hs_k = s_k-\sum_{j=0}^{k-1}\frac{\hs_k^\top s_k}{\norm{\hs_k}^2}\hs_k
+			\hs_{k-1} = s_{k-1}-\sum_{j=0}^{k-2}\frac{\hs_j^\top s_{k-1}}{\norm{\hs_j}^2}\hs_j
 		\end{align*}
-		is the Gram-Schmidt orthogonalisation of $s_k=x_{k+1}-x_k$.
+		is the Gram-Schmidt orthogonalisation of $s_{k-1}=x_{k}-x_{k-1}$.
 	\end{proposition}
+	\begin{proof}
+		See \cite{ZhaAA}.
+	\end{proof}
 \end{frame}
 
 \begin{frame}
-	Taking everything together we obtain
 	\begin{figure}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
@@ -306,7 +312,7 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 	\color{gray}
 	\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
 	\BlankLine
-	Set {\black$B_0=\Id$} and $x_1=f\brk{x_0}$.
+	Set {\black $B_0=\Id$} and $x_1=f\brk{x_0}$.
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$.
@@ -328,12 +334,11 @@ Globally Convergent Type-I Anderson Acceleration for Non-Smooth Fixed-Point Iter
 \end{frame}
 
 
-\section{Modifications to AA-I}
-\subsection{Powell-type regularisation}
+\subsection{Well-definedness of $H_k$: Powell-type regularisation}
 
 \begin{frame}	
-	\frametitle{Powell-type regularisation}
-	Note that $B_k$ may be singular. To fix this we use powell-type regularisation.
+	\frametitle{Well-definedness of $H_k$: Powell-type regularisation}
+	To fix the singularity of $B_k$ we use powell-type regularisation.
 %	\begin{center}
 	\begin{algorithm}[H]
 	\caption{AA-I with Powell-type regularisation}\label{alg:aa1-p}
@@ -367,27 +372,30 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 %	\end{center}
 \end{frame}
 
-\begin{frame}
-	One can obtain
-	\begin{lemma}[Powell-type regularisation]
-		If $B_k$ is well-defined in algorithm \ref{alg:aa1-p} we have that $B_k$ is invertible and $$\abs{\det B_k}\geq \theta^k\,.$$
-	\end{lemma}
-	\begin{proof}
-		See \cite[Lemma 2]{ZhaAA}.
-	\end{proof}
-\end{frame}
+%\begin{frame}
+%	One can obtain
+%	\begin{lemma}[Powell-type regularisation]
+%		If $B_k$ is well-defined in algorithm \ref{alg:aa1-p} we have that $B_k$ is invertible and $$\abs{\det B_k}\geq \bartheta^k\,.$$
+%	\end{lemma}
+%	\begin{proof}
+%		See \cite[Lemma 2]{ZhaAA}.
+%	\end{proof}
+%\end{frame}
 
-\subsection{Restarting iteration}
+\subsection{Well-definedness of $H_k$, memory usage: Restarting iteration}
 \begin{frame}
-	\frametitle{Restarting iteration}
-	Note that
+	\frametitle{Well-definedness of $H_k$, memory usage: Restarting iteration}
+	If $\hs_k=0$ the update
 	\begin{align*}
-		B_{k+1} = B_k+\frac{\brk{\tiy_k-B_ks_k}\hs_k^\top}{\hs_k^\top s_k}
+		B_{k} = B_{k-1}+\frac{\brk{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}
 	\end{align*}
-	is ill-defined iff $\norm{\hs_k}^2=\hs_k^\top s_k=0$, i.e.\ $\hs_k=0$. This occurs in algorithm \ref{alg:aa1-p} for $k>n$ as then $\hs_k=0$ by linear dependence.
-	If we restart the algorithm with $x_k$ as the new starting point if $k=m+1$ for some $m\in\N$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$ for some $\tau\in(0,1)$
-	then 
-	$$g_k\neq 0 \implies s_k=-B_kg_k\neq 0\implies \hs_k\neq 0\,.$$
+	is ill-defined. This occurs in algorithm \ref{alg:aa1-p} e.g.\ for $k>n$ as then $\hs_k=0$ by linear dependence.
+	Hence we restart the algorithm with $x_k$ as the new starting point if
+	\begin{itemize}
+		\item $k=m+1$ for some fixed $m\in\N$ or
+		\item $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$ for some fixed $\tau\in(0,1)$.
+	\end{itemize}
+	It can be shown that $B_k$ is then well-defined.
 \end{frame}
 
 \begin{frame}
@@ -402,7 +410,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	
 	\For{$k=0,1,\dots$}{
 		Set $g_k= g(x_{k})$,
-		$m_k= m_{k-1}+1$, 
+		{\black $m_k= m_{k-1}+1$}, 
 		$s_{k-1}= x_k-x_{k-1}$ and
 		$y_{k-1}= g_k-g_{k-1}$.
 		
@@ -427,25 +435,49 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\end{algorithm}
 \end{frame}
 
+%\begin{frame}
+%	\newconstant{BkUpperBound}
+%	\begin{lemma}[Restarting iteration]
+%		In algorithm \ref{alg:aa1-pr} we have that $B_k$ is well-defined and there exists a constant $\useconstant{BkUpperBound}=\useconstant{BkUpperBound}(m,\bartheta,\tau)>0$ such that
+%		\begin{align*}
+%			\norm{B_k}\leq \useconstant{BkUpperBound}\,.
+%		\end{align*}
+%	\end{lemma}
+%	\begin{proof}
+%		See \cite[Lemma 3]{ZhaAA}.
+%	\end{proof}
+%\end{frame}
+
 \begin{frame}
-	\newconstant{BkUpperBound}
-	\begin{lemma}[Restarting iteration]
-		In algorithm \ref{alg:aa1-pr} we have that $B_k$ is well-defined and there exists a constant $\useconstant{BkUpperBound}=\useconstant{BkUpperBound}(m,\bartheta,\tau)>0$ such that
+	One can then show
+	\newconstant{upperHk}
+	\begin{lemma}[bound on $\norm{H_k}_2$]
+		In algorithm \ref{alg:aa1-pr} we have that $H_k$ is well-defined and there exists a constant $\useconstant{upperHk}=\useconstant{upperHk}(m,n, \bartheta,\tau)>0$ such that
 		\begin{align*}
-			\norm{B_k}\leq \useconstant{BkUpperBound}\,.
+			\norm{H_k}_2\leq \useconstant{upperHk}\,.
 		\end{align*}
 	\end{lemma}
 	\begin{proof}
-		See \cite[Lemma 3]{ZhaAA}.
+		See \cite[Corollary 4]{ZhaAA}.
 	\end{proof}
 \end{frame}
 
 \begin{frame}
+	\centering
+	\scalebox{0.9}{
+	\input{../Figures/Diagram_001}
+	}
+\end{frame}
+
+\subsection{Computational efficiency: Rank-1 update for $H_k$}
+
+\begin{frame}
+	\frametitle{Computational efficiency: Rank-1 update for $H_k$}
 	From the Sherman-Morrison formula one can obtain
 	\begin{proposition}[Rank-1 update for $H_k$]
 		We have
 		\begin{align*}
-			H_{k+1} = H_k+\frac{\brk*{s_k-H_ky_k}\hs_k^\top H_k}{\hs_k^\top H_ky_k}
+			H_{k} = H_{k-1}+\frac{\brk*{s_{k-1}-H_{k-1}y_{k-1}}\hs_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}y_{k-1}}
 		\end{align*}
 	\end{proposition}
 \end{frame}
@@ -478,7 +510,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
 		
 		{\black
-		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$.
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})\hs_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$.
 		}
 		
 		Set $x_{k+1}= x_k-H_kg_k$.
@@ -487,31 +519,10 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\end{algorithm}
 \end{frame}
 
+\subsection{Convergence: Safeguarding steps}
 \begin{frame}
-	\newconstant{upperHk}
-	\begin{lemma}[bound on $\norm{H_k}_2$]
-		In algorithm \ref{alg:aa1-pr} there exists $\useconstant{upperHk}=\useconstant{upperHk}(m,n, \bartheta,\tau)>0$ such that
-		\begin{align*}
-			\norm{H_k}_2\leq \useconstant{upperHk}\,.
-		\end{align*}
-	\end{lemma}
-	\begin{proof}
-		This follows from Lemma (Restarting iteration) and Lemma (Powell-type regularisation).
-	\end{proof}
-\end{frame}
-
-\begin{frame}
-	\centering
-	\scalebox{0.9}{
-	\input{../Figures/Diagram_001}
-	}
-\end{frame}
-
-
-\subsection{Safeguarding steps}
-\begin{frame}
-	\frametitle{Safeguarding steps}
-	To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnosel'skii-Mann steps which are given by
+	\frametitle{Convergence: Safeguarding steps}
+	To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnosel'skii-Mann (KM) steps which are given by
 	\begin{align*}
 		x_{k+1}= (1-\alpha)x_k +\alpha f_k
 	\end{align*}
@@ -523,7 +534,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \begin{frame}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
-	\caption{AA-I with Powell-type regularisation, Restarting and Safeguarding}\label{alg:aa1-prs}
+	\caption{AA-I with Powell-type regularisation, restarting and safeguarding}\label{alg:aa1-prs}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
 	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$,$m \in\N$, $\bartheta, \tau, {\black\alpha}\in(0,1)$ and {\black safe-guarding constants $D,\e>0$}}
@@ -545,7 +556,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		
 		Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
 		
-		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $\tix_{k+1}= x_k-H_kg_k$.
+		Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})\hs_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$ and $\tix_{k+1}= x_k-H_kg_k$.
 		
 		{\black
 		\uIf{$\norm{g_k}\leq D\barU(n_{AA}+1)^{-(1+\e)}$}{
@@ -566,7 +577,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \begin{frame}
 	\frametitle{Convergence result}
 	\begin{theorem}[Convergence]
-		Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k\xrightarrow{k\to\infty}x$ and $f(x)=x$ is a fixed point.
+		Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k$ converges to a fixed point of $f$.
 	\end{theorem}
 \end{frame}
 
@@ -592,7 +603,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	}
 	\end{proofs}
 \end{frame}
-
+\subsection{Proof, part 1}
 \begin{frame}
 	\begin{proofs}[Proof, part 1]
 	The proof follows \cite[Theorem 6]{ZhaAA}.
@@ -652,7 +663,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{equation}
 	\begin{aligned}
 		a_{k+1} &= \norm{x_{k+1}-y}^2\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq}\brk*{\norm{x_k-y}+\useconstant{CDU}(k+1)^{-(1+\e)}}^2 \\
-		&\leq \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\underbrace{\norm{x_k-y}}_{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
+		&\leq \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\overbrace{\norm{x_k-y}}^{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
 		&= a_k+b_k
 	\end{aligned}
 	\label{eq:19}
@@ -668,7 +679,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\end{proofs}
 \end{frame}
 
-
+\subsection{Proof, part 2}
 \begin{frame}
 	\begin{proofs}[Proof, part 2.]
 	Let now $n_j$ and  $N_j\geq n_j$ be such that
@@ -693,6 +704,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\end{proofs}
 \end{frame}
 
+\subsection{Proof, part 3}
 
 \begin{frame}
 	\begin{proofs}[Proof, part 3.]
@@ -705,16 +717,16 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		\norm{y_1} 
 		\xleftarrow{j\to\infty} \norm{x_{k_j}}^2
-		= \norm{x_{k_j}-y}^2+\norm{y}^2+2y^\top x_{k_j}
-		\xrightarrow{j\to\infty} a+\norm{y}^2+2y^\top y_1
+		= \norm{x_{k_j}-y}^2-\norm{y}^2+2y^\top x_{k_j}
+		\xrightarrow{j\to\infty} a-\norm{y}^2+2y^\top y_1
 	\end{align*}
 	and analogously for $y_2$. Thus
 	\begin{align*}
-		\norm{y_i}=a+\norm{y}^2+2y^\top y_i
+		\norm{y_i}=a-\norm{y}^2+2y^\top y_i
 	\end{align*}
 	which implies
 	\begin{align*}
-		2y^\top(y_1-y_2) = \norm{y_1}^2-\norm{y_2}^2
+		2y^\top(y_1-y_2) = \norm{y_1}^2-\norm{y_2}^2\,.
 	\end{align*}
 	\end{proofs}
 \end{frame}
@@ -722,7 +734,11 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 
 \begin{frame}
 	\begin{proofs}[Proof, part 3 (cont.).]
-	It then follows from $y\in\brk[c]{y_i}_i$ that
+	It then follows from 
+	\begin{align*}
+		2y^\top(y_1-y_2) = \norm{y_1}^2-\norm{y_2}^2
+	\end{align*}
+	with $y=y_i$ that
 	\begin{align*}
 		y_1^\top(y_1-y_2) = y_2^\top(y_1-y_2)
 	\end{align*}
@@ -737,7 +753,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 
 \section{Numerical experiments}
 
-\subsection{Regularised logistic regression}
+%\subsection{Regularised logistic regression}
 
 %\begin{frame}
 %	\frametitle{Regularised logistic regression}
@@ -835,7 +851,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_i
 	\end{align*}
-	and $A\in\R^{500\times 1000}$, $b\in\R^{500}$ and some $\alpha, \mu\in\R$.
+	and $A\in\R^{500\times 1000}$, $b\in\R^{500}$ and some $\alpha, \mu\in\R$ as in \cite{ZhaAA}.
 \end{frame}
 
 
@@ -859,7 +875,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 		\caption{Residual norms for the elastic net regression problem.}
 	\end{figure}
 \end{frame}
-\subsection{Elastic net regression}
+\subsection{Markov decision process}
 
 \begin{frame}
 	\frametitle{Markov decision process}
@@ -867,7 +883,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto \brk*{\max_{a} \brk3{ R(s,a)+\gamma \sum_{s'}P(s,a,s')x_{s'}}}_{s}
 	\end{align*}
-	with some $R\in\R^{300\times 200}$, $P\in\R^{300\times 200\times 300}$, $\gamma\in\R$.
+	with some $R\in\R^{300\times 200}$, $P\in\R^{300\times 200\times 300}$, $\gamma\in\R$ as in \cite{ZhaAA}.
 \end{frame}
 
 
@@ -897,29 +913,43 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \begin{frame}
 	\frametitle{Summary}
 	\begin{itemize}
-		\item aim is to find a fixed point of $f$ where
+		\item The aim is to find a fixed point of a non-expansive $f$ where
 		\begin{itemize}
 			\item the dimension is large
 			\item $f$ is expensive to evaluate, noisy and the gradient is a mystery
 		\end{itemize}
-		\item 3 modifications to the AA-I algorithm yield well-definedness and convergence for non-expansive problems
+		\item The main idea is to generalise the fixed point iteration with $x_{k+1}=\sum_i\alpha_if_i$ for some clever choice of $\alpha=\alpha^k\in\R^{k+1}$.
+		\item Modifications of the AA-I algorithm:
 		\begin{itemize}
-			\item Powell-type regularisation
-			\item Restarting iteration
-			\item Safeguarding steps
+			\item Powell-type regularisation \textrightarrow well-definedness
+			\item Restarting iteration \textrightarrow well-definedness, limited memory
+			\item Safeguarding steps \textrightarrow convergence
+			\item Rank-1 update for $H_k$ \textrightarrow matrix-free
 		\end{itemize}
-		\item 
+		\item Convergence result
+		\item Numerical experiments: AA-I with the modifications often outperforms the fixed point iteration.
 	\end{itemize}
 \end{frame}
 
-\section{Sources}
+\section*{Sources}
 
-\begin{frame}[allowframebreaks]
-	\frametitle{Sources}
-	\nocite{*}
+\nocite{*}
+
+\begin{frame}
+	\frametitle{Main source}
 %	\bibliographystyle{plain}
 %	\bibliography{bibliography}
-	\printbibliography
+	\printbibliography[title={Main source},keyword={main}]
+\end{frame}
+
+\begin{frame}
+	\frametitle{Other sources}
+	\printbibliography[keyword={secondary}, title={Other sources}]
+\end{frame}
+
+\begin{frame}
+	\frametitle{Image sources}
+	\printbibliography[title={Image sources}, keyword={image}]
 \end{frame}
 
 

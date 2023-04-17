@@ -47,7 +47,9 @@ class fixed_point_schemes():
         elif method == 'aa1':
             self.step = self.step_aa1
         elif method == 'aa1-matrix':
-            self.step = self.step_aa1_matrix
+            self.step = lambda: self.step_aai_matrix(self.aa1_matrix_Hkgk)
+        elif method == 'aa2-matrix':
+            self.step = lambda: self.step_aai_matrix(self.aa2_matrix_Hkgk)
         else:
             raise Exception('Invalid solver given.')
         
@@ -55,11 +57,14 @@ class fixed_point_schemes():
     def run(self):
         norm_g_ks = [1]
         for k in range(self.K_max):
-            try:
+            if True:
+                try:
+                    x_k, norm_g_k = self.step()
+                except:
+                    print('Algorithm broke down.')
+                    break
+            else:
                 x_k, norm_g_k = self.step()
-            except:
-                print('Algorithm broke down.')
-                break
             norm_g_k = norm_g_k/self.norm_g_0
             norm_g_ks.append(norm_g_k)
             if norm_g_k < self.tol or norm_g_k > 1/self.tol:
@@ -126,7 +131,7 @@ class fixed_point_schemes():
         norm_g_k = norm(self.g(self.x_k))
         return self.x_k, norm_g_k
     
-    def step_aa1_matrix(self):
+    def step_aai_matrix(self, matrix_Hkgk):
         # implementation of the aa1 with matrices
         self.m_k += 1
         self.m_k = np.min((self.m_k, self.m))
@@ -140,13 +145,22 @@ class fixed_point_schemes():
         self.x_km1 = self.x_k
         S_k_cut = self.S_k[-self.m_k:,:]
         Y_k_cut = self.Y_k[-self.m_k:,:]
-        try:
-            tmp = np.linalg.solve(S_k_cut@Y_k_cut.transpose(), S_k_cut@g_k)
-        except np.linalg.LinAlgError:
-            tmp = np.linalg.lstsq(S_k_cut@Y_k_cut.transpose(), S_k_cut@g_k, rcond=None)[0]
-        self.x_k = self.x_k -(g_k+(S_k_cut-Y_k_cut).transpose()@tmp)
+        self.x_k -= matrix_Hkgk(S_k_cut, Y_k_cut, g_k)
         return self.x_k, norm_g_k
-        
+    
+    def aa1_matrix_Hkgk(self, S_k, Y_k, g_k):
+        try:
+            tmp = np.linalg.solve(S_k@Y_k.transpose(), S_k@g_k)
+        except np.linalg.LinAlgError:
+            tmp = np.linalg.lstsq(S_k@Y_k.transpose(), S_k@g_k, rcond=None)[0]
+        return g_k+(S_k-Y_k).transpose()@tmp
+    
+    def aa2_matrix_Hkgk(self, S_k, Y_k, g_k):
+        try:
+            tmp = np.linalg.solve(Y_k@Y_k.transpose(), Y_k@g_k)
+        except np.linalg.LinAlgError:
+            tmp = np.linalg.lstsq(Y_k@Y_k.transpose(), Y_k@g_k, rcond=None)[0]
+        return g_k+(S_k-Y_k).transpose()@tmp
     
     def eval_H(self, x):
         return x + self.vs.transpose()@(self.ws@x)

@@ -38,20 +38,19 @@ def run_problems(problems, methods, export_name='norm_gk', show_plots=True, ms =
         if show_plots:
             plt.show()
         else:
-            ax.set(xlabel=r'iteration number $k$', ylabel=r'residual $\norm{g(x_k)}/\norm{g(x_0)}$')
+            ax.set(xlabel=r'iteration number $k$', ylabel=r'residual $\norm{g_k}/\norm{g_0}$')
             tikzplotlib.save(f'../Plots/{export_name}_{problem}.pgf')
 
 
 if __name__ == '__main__':
     problems = ['CO', 'GD', 'ISTA', 'VI']
-    methods = ['aa1-matrix', 'aa1', 'aa1-safe', 'original']
+    methods = ['aa1-matrix', 'aa1', 'aa1-safe', 'aa2-matrix', 'original']
     ms = [2,5,10,20,50]
     withms = [True, True, False]
 
-
-    if False:
+    if True:
         run_problems(problems[:-1], methods[1:], 'method_comparison', False)
-    if False:
+    if True:
         run_problems(problems[:-1], methods[2:3], 'memory_comparison', False, ms, len(problems)*[0.1], len(methods)*[True])
     if True:
         run_problems(problems[-1:], methods, 'method_comparison', False, K_maxs=[100])

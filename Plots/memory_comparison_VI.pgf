@@ -27,7 +27,7 @@ xlabel={iteration number \(\displaystyle k\)},
 xmin=-3.65, xmax=76.65,
 xtick style={color=black},
 y grid style={darkgray176},
-ylabel={residual \(\displaystyle \norm{g(x_k)}/\norm{g(x_0)}\)},
+ylabel={residual \(\displaystyle \norm{g_k}/\norm{g_0}\)},
 ymin=2.06939624145893e-06, ymax=81.2659656416253,
 ymode=log,
 ytick style={color=black}
