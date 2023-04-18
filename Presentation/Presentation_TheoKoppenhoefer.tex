@@ -29,7 +29,9 @@
 % Frame 3
 \frame[plain]{ \frametitle{Table of contents} \tableofcontents }
 
-\section{The problem setting}
+
+\section{Motivation of AA-I}
+\subsection{The problem setting}
 \begin{frame}
 	\frametitle{The problem setting}
 	\begin{problem}[find fixed point]
@@ -50,7 +52,6 @@
 	\end{itemize}
 \end{frame}
 
-\section{Motivation of AA-I}
 \subsection{Fixed point iteration}
 \begin{frame}
 	\frametitle{Fixed point iteration}
@@ -228,11 +229,14 @@
 \subsection{AA-I}
 \begin{frame}
 	\frametitle{AA-I}
-	This is the form of a quasi-Newton-like method so one could expect $H_k$ to be an approximate inverse of $\nabla f(x_k)$. Indeed
+	This is the form of a quasi-Newton-like method so one could expect $H_k$ to be an approximate inverse of $\nabla f(x_k)$. Indeed one can show
 	\begin{proposition}[Approximate inverse Jacobian]
 		$H_k$ minimises $\norm{H_k-\Id}_F$ under the multisecant condition $H_kS_k=Y_k$.
 	\end{proposition}
-	From Broydens method we know that it is a good idea to approximate the Jacobian rather than its inverse.
+	\begin{proof}
+		See \cite{ZhaAA}.
+	\end{proof}
+	The good Broyden method approximates the Jacobian rather than its inverse and tends to yield better results. This motivates
 	\begin{definition}[Approximate Jacobian]
 		Let $B_k$ be minimiser of $\norm{B_k-\Id}_F$ under the condition $B_kY_k=S_k$.
 	\end{definition}
@@ -629,28 +633,29 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	Let $y$ be a fixed point. We distinguish
 	\begin{description}
 		\item[case (a)]
-		$k\in K_{AA}$ then
+		$k_i\in K_{AA}$ then
 		\newconstant{CDU}
 		\begin{equation}
 		\begin{aligned}
-			\norm{x_{k+1}-y}&\leq \norm{x_k-y}+\norm{H_kg_k} \\
-			&\leq \norm{x_k-y}+\useconstant{upperHk}\norm{g_k} \\
-			&\leq \norm{x_k-y}+\useconstant{CDU}(k+1)^{-(1+\e)}
+			\norm{x_{k_i+1}-y}&\leq \norm{x_{k_i}-y}+\norm{H_{k_i}g_{k_i}} \\
+			&\leq \norm{x_{k_i}-y}+\useconstant{upperHk}\norm{g_k} \\
+			&\leq \norm{x_{k_i}-y}+\useconstant{CDU}(i+1)^{-(1+\e)}
 			\label{eq:16}
 		\end{aligned}
 		\end{equation}
 		\item[case (b)]
-		$k\in K_{KM}$ then as $f$ is nonexpansive (motivate this)
+		$l_i\in K_{KM}$ then one can show (see \cite[Theorem 6]{ZhaAA})
 		\begin{align}
-			\norm{x_{k+1}-y}^2\leq \norm{x_k-y}^2-\alpha(1-\alpha)\norm{g_k}^2
+			\norm{x_{l_i+1}-y}^2\leq \norm{x_{l_i}-y}^2-\alpha(1-\alpha)\norm{g_{l_i}}^2
 			\label{eq:17}
 		\end{align}
+		where one uses the non-expansiveness of $f$ and the fact that $y$ is a fixed point.
 	\end{description}
 	Hence in any case
 	\newconstant{E}
 	\begin{align*}
 		\norm{x_k-y}
-		\leq \norm{x_0-y}+\useconstant{CDU}\sum_k(k+1)^{-(1+\e)}
+		\leq \norm{x_0-y}+\useconstant{CDU}\sum_i(i+1)^{-(1+\e)}
 		= \useconstant{E}<\infty\,.
 	\end{align*}
 	\end{proofs}
@@ -662,9 +667,9 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	It then follows that
 	\begin{equation}
 	\begin{aligned}
-		a_{k+1} &= \norm{x_{k+1}-y}^2\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq}\brk*{\norm{x_k-y}+\useconstant{CDU}(k+1)^{-(1+\e)}}^2 \\
-		&\leq \underbrace{\norm{x_k-y}^2}_{=a_k}+\underbrace{\useconstant{CDU}^2(k+1)^{-2(1+\e)}+2\useconstant{CDU}\overbrace{\norm{x_k-y}}^{\leq \useconstant{E}}(k+1)^{-(1+\e)}}_{=b_k} \\
-		&= a_k+b_k
+		a_{{k_i}+1} &= \norm{x_{{k_i}+1}-y}^2\stackrel{\eqref{eq:16}, \eqref{eq:17}}{\leq}\brk*{\norm{x_{k_i}-y}+\useconstant{CDU}(i+1)^{-(1+\e)}}^2 \\
+		&\leq \underbrace{\norm{x_{k_i}-y}^2}_{=a_{k_i}}+\underbrace{\useconstant{CDU}^2(i+1)^{-2(1+\e)}+2\useconstant{CDU}\overbrace{\norm{x_{k_i}-y}}^{\leq \useconstant{E}}(i+1)^{-(1+\e)}}_{=b_{k_i}} \\
+		&= a_{k_i}+b_{k_i}
 	\end{aligned}
 	\label{eq:19}
 	\end{equation}
@@ -672,7 +677,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		\alpha(1-\alpha)\sum_i\norm{g_{l_i}}^2
 		\stackrel{\eqref{eq:17}}{\leq} \sum_i a_{l_i}-a_{l_i+1}
-		\stackrel{\eqref{eq:19}}{\leq}a_0+\sum_k b_k
+		\stackrel{\eqref{eq:19}}{\leq}a_0+\sum_i b_i
 		<\infty
 	\end{align*}
 	We therefore have $\lim_i\norm{g_{l_i}}=0$. It also follows from $\norm{g_{k_i}}\leq D\barU (i+1)^{-(1+\e)}$ that $\lim_i\norm{g_{k_i}}=0$. Thus indeed $\lim_k\norm{g_k}=0$.
