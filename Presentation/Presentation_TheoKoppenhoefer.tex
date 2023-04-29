@@ -44,7 +44,7 @@
 	We also assume
 	\begin{itemize}
 		\item $f$ has a fixed point.
-		\item $f$ is nonexpansive, i.e.\ $\norm{f(x)-f(y)}\leq\norm{x-y}$.
+		\item $f$ is non-expansive, i.e.\ $\norm{f(x)-f(y)}\leq\norm{x-y}$.
 		\item $\nabla f$ is unknown \textrightarrow no Newton
 		\item noisy problem \textrightarrow no finite difference derivatives
 		\item cost of evaluating $f$ is high \textrightarrow no line search
@@ -231,7 +231,7 @@
 	\frametitle{AA-I}
 	This is the form of a quasi-Newton-like method so one could expect $H_k$ to be an approximate inverse of $\nabla f(x_k)$. Indeed one can show
 	\begin{proposition}[Approximate inverse Jacobian]
-		$H_k$ minimises $\norm{H_k-\Id}_F$ under the multisecant condition $H_kS_k=Y_k$.
+		$H_k$ minimises $\norm{H_k-\Id}_F$ under the multi-secant condition $H_kS_k=Y_k$.
 	\end{proposition}
 	\begin{proof}
 		See \cite{ZhaAA}.
@@ -342,7 +342,7 @@
 
 \begin{frame}	
 	\frametitle{Well-definedness of $H_k$: Powell-type regularisation}
-	To fix the singularity of $B_k$ we use powell-type regularisation.
+	To fix the singularity of $B_k$ we use Powell-type regularisation.
 %	\begin{center}
 	\begin{algorithm}[H]
 	\caption{AA-I with Powell-type regularisation}\label{alg:aa1-p}
@@ -490,7 +490,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 \begin{frame}
 %	\IncMargin{1em}
 	\begin{algorithm}[H]
-	\caption{AA-I with Powell-type regularisation and Restarting}\label{alg:aa1-pr}
+	\caption{AA-I with Powell-type regularisation and Restarting}\label{alg:aa1-pr-Hk}
 	\SetKwInOut{Input}{Input}
 	\color{gray}
 	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\black$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
@@ -677,7 +677,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\begin{align*}
 		\alpha(1-\alpha)\sum_i\norm{g_{l_i}}^2
 		\stackrel{\eqref{eq:17}}{\leq} \sum_i a_{l_i}-a_{l_i+1}
-		\stackrel{\eqref{eq:19}}{\leq}a_0+\sum_i b_i
+		\stackrel{\eqref{eq:19}}{\leq}a_0+\sum_k b_k
 		<\infty
 	\end{align*}
 	We therefore have $\lim_i\norm{g_{l_i}}=0$. It also follows from $\norm{g_{k_i}}\leq D\barU (i+1)^{-(1+\e)}$ that $\lim_i\norm{g_{k_i}}=0$. Thus indeed $\lim_k\norm{g_k}=0$.
@@ -720,14 +720,14 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	we have that $y_1$ is a fixed point and $y_2$ too.
 	Now by part 2
 	\begin{align*}
-		\norm{y_1} 
+		\norm{y_1}^2
 		\xleftarrow{j\to\infty} \norm{x_{k_j}}^2
 		= \norm{x_{k_j}-y}^2-\norm{y}^2+2y^\top x_{k_j}
 		\xrightarrow{j\to\infty} a-\norm{y}^2+2y^\top y_1
 	\end{align*}
 	and analogously for $y_2$. Thus
 	\begin{align*}
-		\norm{y_i}=a-\norm{y}^2+2y^\top y_i
+		\norm{y_i}^2=a-\norm{y}^2+2y^\top y_i
 	\end{align*}
 	which implies
 	\begin{align*}
@@ -854,7 +854,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\end{align*}
 	with shrinkage operator
 	\begin{align*}
-		S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_i
+		S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_{i=1}^{1000}
 	\end{align*}
 	and $A\in\R^{500\times 1000}$, $b\in\R^{500}$ and some $\alpha, \mu\in\R$ as in \cite{ZhaAA}.
 \end{frame}
@@ -886,7 +886,7 @@ s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
 	\frametitle{Markov decision process}
 	Our aim is to find a fixed point of the Bellman operator
 	\begin{align*}
-		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto \brk*{\max_{a} \brk3{ R(s,a)+\gamma \sum_{s'}P(s,a,s')x_{s'}}}_{s}
+		f\colon\R^{1000}\to\R^{1000}, \quad x\mapsto \brk*{\max_{a} \brk3{ R_{sa}+\gamma \sum_{s'}P_{sas'}x_{s'}}}_{s=1}^{1000}
 	\end{align*}
 	with some $R\in\R^{300\times 200}$, $P\in\R^{300\times 200\times 300}$, $\gamma\in\R$ as in \cite{ZhaAA}.
 \end{frame}
