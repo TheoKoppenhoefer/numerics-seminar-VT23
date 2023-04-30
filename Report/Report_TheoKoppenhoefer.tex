@@ -22,20 +22,12 @@
 
 \section{Introduction}
 
-%TODO: The following report is based on ... can be found online under ... deals with ... with structure ...
+The following report will summarise and present the main results of the paper \cite{ZhaAA} as part of the course NUMN27, Seminar in Numerical Analysis.
+More precisely, we start by motivating the Anderson-acceleration-I (AA-I) algorithm. We will then discuss the modifications made to the algorithm. After that we will give the main convergence result and finally test the AA-I algorithm in numerical experiments. The report, the python implementation and the corresponding presentation of the topic can be found online under \cite{Repository}.
 
-The following report will summarise and present the main results of the paper \cite{ZhaAA} as part of the course NUMN27, Seminar in Numerical Analysis. More precisely the report will deal with a modification of the Anderson-Accelleration-I (AA-I) algorithm as described in \cite{ZhaAA}. For this we start with a motivation of the AA-II algorithm. Then we will discuss the modifications made to the algorithm. After that we will give the main convergence result and finally test the AA-I algorithm in numerical experiments. The report, the python implementation and the corresponding presentation of the topic can be found online under \cite{Repository}.
-
-
-\section{Motivation of the Anderson-Acceleration algorithm}
-
-In science it is a common problem to find a fixed point $x=f(x)\in\R^n$ of a function $f\colon\R^n\to\R^n$. An equivalent formulation is to find a zero $x\in\R^n$ of the function $g=\Id-f$. In the following we assume that $f$ indeed has a fixed point and that $f$ is non-expansive, i.e.\ we have for all $x,y\in\R^n$ that
-\begin{align*}
-	\norm{f(x)-f(y)}\leq\norm{x-y}\,.
-\end{align*}
-We however also assume that $\nabla f$ is unknown which means we cannot use Newton iteration to solve our problem. We also assume that our problem is noisy so that we cannot take finite difference derivatives. If the cost of evaluating $f$ is very high then line search becomes infeasable and if $n$ is very large we are forced to work matrix free. We know that this type of problem can be solved by the fixed point iteration described in algorithm \ref{alg:original}.
 
 \begin{figure}
+\centering
 \begin{algorithm}[H]
 \caption{Fixed point iteration (original)}
 \label{alg:original}
@@ -49,13 +41,11 @@ We however also assume that $\nabla f$ is unknown which means we cannot use Newt
 \end{algorithm}
 \end{figure}
 
-It can be shown that the fixed point iteration will in this case converge to a fixed point of $f$. This convergence can be very slow in practice if the Lipshitz-constant of $f$ is close to $1$. It is here were the Anderson-Acceleration (AA) methods come in.
-
-The main idea of the AA is to use the information gained from previous function evaluations. To update $x_{k+1}$ we form a weighted average as described in algorithm \ref{alg:aai}. For simplicity of notation we assume here and in the following that our memory is unlimited.
-
-\begin{figure}
+\begin{figure}[h]
+\centering
+\begin{minipage}{0.41\textwidth}
 \begin{algorithm}[H]
-\caption{General AA (Anderson Acceleration)}
+\caption{General AA}
 \label{alg:aai}
 \SetKwInOut{Input}{Input}
 
@@ -72,15 +62,9 @@ The main idea of the AA is to use the information gained from previous function 
 	}
 }
 \end{algorithm}
-\end{figure}
-
-The General AA leaves the quation open of how to choose the $\alpha\in\R^{k+1}$. Since finding a fixed point of $f$ is equivalent to finding a zero of $f=\Id-f$ it seems sensible to require $\alpha$ to minimise
-\begin{align*}
-	\norm{\sum_i\alpha_ig_i}_2\,.
-\end{align*}
-This then yields the AA-II algorithm given in \ref{alg:aa2}.
-
-\begin{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.58\textwidth}
 \begin{algorithm}[H]
 \caption{AA-II}
 \label{alg:aa2}
@@ -93,80 +77,35 @@ This then yields the AA-II algorithm given in \ref{alg:aa2}.
   
   {\black Set $g_k = x_k-f_k$.}
   
-  Choose $\alpha\in \R^{k+1}$ such that $\sum_i\alpha_i=1$ {\black and such that $\alpha$ minimises $\norm{\sum_i\alpha_ig_i}_2$}.
+  Choose $\alpha\in \R^{k+1}$ such that $\sum_i\alpha_i=1$ {\black and such that $\alpha$ minimises $\norm{\sum_i\alpha_ig_i}$}.
   
  Set $x_{k+1} = \sum_i \alpha_if_{i}$.
 }
 \end{algorithm}
+\end{minipage}
 \end{figure}
 
 
-%
-%	
-%	Setting 
-%	\begin{align*}
-%		\alpha=\vect{\gamma_0 \\ \gamma_1-\gamma_0 \\ \vdots \\ \gamma_{k}-\gamma_{k-1} \\ 1-\gamma_k}
-%		\text{ and }
-%		Y_k = \begin{bmatrix}
-%			& & \\
-%			g_{1}-g_0 & \cdots & g_{k}-g_{k-1} \\
-%			& &
-%		\end{bmatrix} \in\R^{n\times k}
-%	\end{align*}
-%	one obtains the least squares problem
-%	\begin{align*}
-%		\min_{\substack{\alpha\in\R^{k+1} \\ \sum_i\alpha_i=1}}\norm2{\sum_i\alpha_ig_i}
-%		= \min_{\gamma \in\R^k}\norm{g_k-Y_k\gamma}
-%	\end{align*}
-%	which is solved by
-%	\begin{align*}
-%		\gamma= \gamma^k = \brk*{Y_k^\top Y_k}^{-1}Y_k^\top g_k\,.
-%	\end{align*}
-%
-%
-%
-%	If we now set
-%	\begin{align*}
-%		S_k = \begin{bmatrix}
-%			& & \\
-%			x_1-x_0 & \cdots & x_{k}-x_{k-1} \\
-%			& & \\
-%		\end{bmatrix} \in\R^{n\times k}
-%	\end{align*}
-%	we see that
-%	\begin{align*}
-%		S_k -Y_k &= \begin{bmatrix}
-%			& & \\
-%			x_1-x_0-(g_1-g_0) & \cdots & x_{k}-x_{k-1}-(g_{k}-g_{k-1}) \\
-%			& & \\
-%		\end{bmatrix} \\
-%		&= \begin{bmatrix}
-%			& & \\
-%			f_1-f_0 & \cdots & f_k-f_{k-1} \\
-%			& & \\
-%		\end{bmatrix}
-%	\end{align*}
-%
-%
-%
-%	and hence
-%	\begin{align*}
-%		x_{k+1} &= \sum_i\alpha_if_i \\
-%		&= f_k -(S_k-Y_k)\gamma \\ \\
-%		&\tikzmark{def_gamma}{=} x_k -\underbrace{\brk*{\Id+(S_k-Y_k)\brk*{Y_k^\top Y_k}^{-1}Y_k^\top}}_{=H_k}g_k \\
-%		&= x_k -H_kg_k\,.
-%	\end{align*}
-%	\tikzset{external/export=false}
-%	\begin{tikzpicture}[remember picture, overlay, node distance = 0.3cm]
-%		\node[,text width=10cm] (def_gamma_descr) [above right=0.2cm and 0.1cm of def_gamma]{$f_k=x_k-g_k$ and $\gamma=\brk*{Y_k^\top Y_k}^{-1}Y_k^\top$};
-%		\draw[,->,thick] (def_gamma_descr) to [in=90,out=180] (def_gamma);
-%	\end{tikzpicture}%
-%
+\section{Motivation of the Anderson-Acceleration algorithm}
 
+In science it is a common problem to find a fixed point $x=f(x)\in\R^n$ of a function $f\colon\R^n\to\R^n$. An equivalent formulation is to find a zero $x\in\R^n$ of the function $g=\Id-f$. In the following we assume that $f$ indeed has a fixed point and that $f$ is non-expansive, i.e.\ we have for all $x,y\in\R^n$ that
+\begin{align*}
+	\norm{f(x)-f(y)}\leq\norm{x-y}\,.
+\end{align*}
+We however also assume that $\nabla f$ is unknown which means we cannot use Newton iteration to solve our problem. We also assume that our problem is noisy so that we cannot take finite difference derivatives. If the cost of evaluating $f$ is very high then line search becomes infeasable and if $n$ is very large we are forced to work matrix free. We know that this type of problem can be solved by the fixed point iteration described in algorithm \ref{alg:original}.
 
-It is shown in \cite{ZhaAA} that this update can be brought into the form of a quasi-Newton-like method as shown in algorithm \ref{alg:aa2-ref}.
+It can be shown that the fixed point iteration will in this case converge to a fixed point of $f$. This convergence can be very slow in practice if the Lipshitz-constant of $f$ is close to $1$. It is here were the Anderson-Acceleration (AA) methods come in.
+
+The main idea of AA methods is to use the information gained from previous function evaluations of $f$. To update $x_{k+1}$ we now form a weighted average as described in algorithm \ref{alg:aai}. For simplicity of notation we assume here and in the following that our memory is unlimited.
+
+The General AA algorithm requires a specific choice of $\alpha\in\R^{k+1}$. Since finding a fixed point of $f$ is equivalent to finding a zero of $f=\Id-f$ it seems sensible to require $\alpha$ to minimise
+\begin{align*}
+	\norm{\sum_i\alpha_ig_i}\,.
+\end{align*}
+This choice of $\alpha$ yields the AA-II algorithm given in \ref{alg:aa2}.
 
 \begin{figure}
+\centering
 %	\IncMargin{1em}
 \begin{algorithm}[H]
 \caption{AA-II (reformulated)}
@@ -191,22 +130,22 @@ It is shown in \cite{ZhaAA} that this update can be brought into the form of a q
 \end{algorithm}
 \end{figure}
 
-Now one could expect $H_k$ to be an approximate inverse of $\nabla f(x_k)$. Indeed one can show
+It is shown in \cite[Section 2.2]{ZhaAA} that this update can be brought into the form of a quasi-Newton-like method given in algorithm \ref{alg:aa2-ref}. This method bears a lot of similarities with the bad Broyden method where $H_k$ is an approximate inverse of $\nabla f(x_k)$. Indeed one can show
 \begin{proposition}[Approximate inverse Jacobian]
-	$H_k$ minimises $\norm{H_k-\Id}_F$ under the multi-secant condition $H_kS_k=Y_k$.
+	In algorithm \ref{alg:aa2-ref} the matrix $H_k$ minimises $\norm{H_k-\Id}_F$ under the multi-secant condition $H_kS_k=Y_k$.
 \end{proposition}
 \begin{proof}
-	See \cite{ZhaAA}.
+	See \cite[Section 2.2]{ZhaAA}.
 \end{proof}
-The good Broyden method approximates the Jacobian rather than its inverse and tends to yield better results. This motivates to choose  $B_k$ to be a minimiser of $\norm{B_k-\Id}_F$ under the condition $B_kY_k=S_k$.
-One can then show that
+The good Broyden method approximates the Jacobian rather than its inverse and tends to yield better results than the bad Broyden. This motivates to choose  $B_k=H_k^{-1}$ to be a minimiser of $\norm{B_k-\Id}_F$ under the condition $B_kY_k=S_k$.
+If one chooses $B_k$ in this way it is motivated in \cite[Section 2.3]{ZhaAA} that
 \begin{align*}
 	B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top\,.
 \end{align*}
-which yields the AA-I algorithm \ref{alg:aa1}.
+This yields the AA-I algorithm \ref{alg:aa1}.
 
 \begin{figure}
-%	\IncMargin{1em}
+\centering
 \begin{algorithm}[H]
 \caption{AA-I}
 \label{alg:aa1}
@@ -221,29 +160,25 @@ Set $x_1=f(x_0)$
 	
 	Construct $S_k$ from $x_0,\dots, x_k$ and $Y_k$ from $g_0,\dots,g_k$.
 			
-	{\black Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top\in\R^{n\times n}$.
+	{\black Set $B_k = \Id+\brk*{Y_k-S_k}\brk*{S_k^\top S_k}^{-1}S_k^\top\in\R^{n\times n}$.}
 	
-	Set $H_k = B_k^{-1}$.}
-%		$s_{k-1}= x_k-x_{k-1}$ and
-%		$y_{k-1}= g_k-g_{k-1}$.
-	
-	Set $x_{k+1}= x_k-H_kg_k$.
+	Set $x_{k+1}= x_k-H_kg_k$ with $H_k=B_k^{-1}$.
 }
 \end{algorithm}
 \end{figure}
 
+\newpage
+\section{Modifications of the AA-I algorithm}
 
-\section{Modifications to AA-I}
-
-The AA-I algorithm as stated in \ref{alg:aa1} has some apparent problems. For one, the approach is not matrix-free. This will be fixed by a rank-1 update formula for matrices $B_k$ and later $H_k$. It may also occur in a step that the matrix $H_k$ is not well-defined. This may occur if $B_k$ itself is not well-defined or is singular. The well-definedness will be resolved by the Powell-type regularisation and the restarting of the iteration. The restarting of the iteration will also yield an algorithm that does not require unlimited memory. Lastly, this algorithm does not have the convergence property of the fixed point iteration algorithm. This will be resolved by the safeguarding of steps.
+The AA-I algorithm as stated in \ref{alg:aa1} has some issues. For one, the approach is not matrix-free. This is fixed by a rank-1 update formula for matrices $B_k$ and later for $H_k$. It may also occur in a step that the matrix $H_k$ is not well-defined. This may occur if $B_k$ itself is not well-defined or is singular. The well-definedness will be resolved by the Powell-type regularisation and the restarting of the iteration. The restarting of the iteration will also yield an algorithm that does not require unlimited memory. Lastly, this algorithm does not have the convergence property of the fixed point iteration algorithm. This will be resolved by adding a safeguarding of steps.
 	
 	
-One can show that
+We start with the rank-1 update formula for $B_k$. One can show that
 \begin{proposition}[Rank-1 update for $B_k$]
 	We have
-	\begin{align*}
-		B_{k} = B_{k-1}+\frac{\brk*{y_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}
-	\end{align*}
+	\begin{align}
+		B_{k} = B_{k-1}+\frac{\brk*{y_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}\label{eq:Bk_rank1}
+	\end{align}
 	where $y_{k-1} = g_{k}-g_{k-1}$, $B_0=\Id$ and
 	\begin{align*}
 		\hs_{k-1} = s_{k-1}-\sum_{j=0}^{k-2}\frac{\hs_j^\top s_{k-1}}{\norm{\hs_j}^2}\hs_j
@@ -253,96 +188,14 @@ One can show that
 \begin{proof}
 	See \cite{ZhaAA}.
 \end{proof}
-
-
-
-\begin{figure}
-%	\IncMargin{1em}
-\begin{algorithm}[H]
-\caption{AA-I (rank-1 update)}
-\SetKwInOut{Input}{Input}
-
-\Input{$x_0\in\R^n$ and $f\colon\R^n\to\R^n$.}
-\BlankLine
-Set {\black $B_0=\Id$} and $x_1=f\brk{x_0}$.
-
-\For{$k=0,1,\dots$}{
-	Set $g_k= g(x_{k})$.
-	
-	{\black
-	Set $s_{k-1}= x_k-x_{k-1}$,
-	$y_{k-1}= g_k-g_{k-1}$ and
-	$\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
-	
-	Set $B_k = B_{k-1}+\frac{\brk*{y_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.}
-	
-	Set $H_k=B_k^{-1}$.
-	
-	Set $x_{k+1}= x_k-H_kg_k$.
-	
-}
-\end{algorithm}
-\end{figure}
-
-
-
-\subsection{Well-definedness of $H_k$: Powell-type regularisation}
-
-	
-	
-To fix the singularity of $B_k$ we use Powell-type regularisation.
-%	\begin{center}
-
-\begin{algorithm}[H]
-\caption{AA-I with Powell-type regularisation}\label{alg:aa1-p}
-\SetKwInOut{Input}{Input}
-
-s	\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$ and ${\black\bartheta\in(0,1)}$.}
-\BlankLine
-Set $B_0=\Id$ and $x_1=f\brk{x_0}$.
-
-\For{$k=0,1,\dots$}{
-	Set $g_k= g(x_{k})$,
-	$s_{k-1}= x_k-x_{k-1}$ and
-	$y_{k-1}= g_k-g_{k-1}$.
-	
-	Set $\hs_{k-1}= s_{k-1}-\sum_{i=0}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
-	
-	{\black
-	Choose $\theta_{k-1}$ in dependence of $\bartheta$.
-	
-	Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
-	}
-	
-	Set $B_k = B_{k-1}+\frac{\brk*{{\black\tiy_{k-1}}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.
-	
-	Set $H_k=B_k^{-1}$.
-	
-	Set $x_{k+1}= x_k-H_kg_k$.
-	
-}
-\end{algorithm}	
-%	\end{center}
-
-
-%
-%	One can obtain
-%	\begin{lemma}[Powell-type regularisation]
-%		If $B_k$ is well-defined in algorithm \ref{alg:aa1-p} we have that $B_k$ is invertible and $$\abs{\det B_k}\geq \bartheta^k\,.$$
-%	\end{lemma}
-%	\begin{proof}
-%		See \cite[Lemma 2]{ZhaAA}.
-%	\end{proof}
-%
-
-\subsection{Well-definedness of $H_k$, memory usage: Restarting iteration}
-
-	
-If $\hs_k=0$ the update
+To fix the potential (approximate) singularity of $B_k$ we use Powell-type regularisation. This means that instead of using equation \ref{eq:Bk_rank1} to update $B_k$ one uses the following modification
 \begin{align*}
-	B_{k} = B_{k-1}+\frac{\brk{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}
+		B_{k} = B_{k-1}+\frac{\brk*{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}\,.
 \end{align*}
-is ill-defined. This occurs in algorithm \ref{alg:aa1-p} e.g.\ for $k>n$ as then $\hs_k=0$ by linear dependence.
+Here $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$ where $\theta_{k-1}\in\R$ is chosen in dependence of a parameter $\bartheta$.
+This is a modification of the update of $B_k$ is given in algorithm \ref{alg:aa1-pr}.
+
+If $\hs_k\approx 0$ the update of $B_k$ in ($*$) in algorithm \ref{alg:aa1-pr} becomes instable and for $\hs_k=0$ ill-defined.
 Hence we restart the algorithm with $x_k$ as the new starting point if
 \begin{itemize}
 	\item $k=m+1$ for some fixed $m\in\N$ or
@@ -350,14 +203,13 @@ Hence we restart the algorithm with $x_k$ as the new starting point if
 \end{itemize}
 It can be shown that $B_k$ is then well-defined.
 
-
-
-%	\IncMargin{1em}
+\begin{figure}[h]
+\centering
 \begin{algorithm}[H]
 \caption{AA-I with Powell-type regularisation and Restarting}\label{alg:aa1-pr}
 \SetKwInOut{Input}{Input}
 
-\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\black$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
+\Input{$x_0\in\R^n$, $f\colon\R^n\to\R^n$, {\black$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
 \BlankLine
 Set $B_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
 
@@ -378,52 +230,37 @@ Set $B_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
 	
 	Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
 	
-	Set $B_k = B_{k-1}+\frac{\brk*{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.
+	Set $B_k = B_{k-1}+\frac{\brk*{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}$.\brkcomment*[r]{*}
 	
-	Set $H_k=B_k^{-1}$.
-	
-	Set $x_{k+1}= x_k-H_kg_k$.
+	Set $x_{k+1}= x_k-H_kg_k$ with $H_k=B_k^{-1}$.
 	
 }
 \end{algorithm}
-
-
-%
-%	\newconstant{BkUpperBound}
-%	\begin{lemma}[Restarting iteration]
-%		In algorithm \ref{alg:aa1-pr} we have that $B_k$ is well-defined and there exists a constant $\useconstant{BkUpperBound}=\useconstant{BkUpperBound}(m,\bartheta,\tau)>0$ such that
-%		\begin{align*}
-%			\norm{B_k}\leq \useconstant{BkUpperBound}\,.
-%		\end{align*}
-%	\end{lemma}
-%	\begin{proof}
-%		See \cite[Lemma 3]{ZhaAA}.
-%	\end{proof}
-%
-
+\end{figure}
 
 One can then show
 \newconstant{upperHk}
-\begin{lemma}[bound on $\norm{H_k}_2$]
+\begin{lemma}[bound on $\norm{H_k}_2$]\label{le:H_kUpperBound}
 	In algorithm \ref{alg:aa1-pr} we have that $H_k$ is well-defined and there exists a constant $\useconstant{upperHk}=\useconstant{upperHk}(m,n, \bartheta,\tau)>0$ such that
 	\begin{align*}
 		\norm{H_k}_2\leq \useconstant{upperHk}\,.
 	\end{align*}
 \end{lemma}
 \begin{proof}
-	See \cite[Corollary 4]{ZhaAA}.
+	See \cite[Corollary 4]{ZhaAA} for details. An outline of the proof is given in figure \ref{fig:Diagram_001}. The idea is to use two Lemmas which provide a bound of $\norm{B_k}$ from above and of $\abs{\det B_k}$ from below.
+	
+	\begin{figure}
+	\centering
+%	\tikzexternaldisable
+	\scalebox{0.7}{{\normalsize
+	\input{../Figures/Diagram_001}
+	}}
+	\caption{Outline of proof of lemma \ref{le:H_kUpperBound}.}
+	\label{fig:Diagram_001}
+%	\tikzexternalenable
+	\end{figure}
 \end{proof}
-
-
-
-\scalebox{0.9}{
-\input{../Figures/Diagram_001}
-}
-
-
-\subsection{Computational efficiency: Rank-1 update for $H_k$}
-
-
+This bound on $\norm{H_k}_2$ will later be used when showing convergence of the final algorithm.
 
 From the Sherman-Morrison formula one can obtain
 \begin{proposition}[Rank-1 update for $H_k$]
@@ -432,66 +269,24 @@ From the Sherman-Morrison formula one can obtain
 		H_{k} = H_{k-1}+\frac{\brk*{s_{k-1}-H_{k-1}y_{k-1}}\hs_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}y_{k-1}}
 	\end{align*}
 \end{proposition}
+This formula has been incorporated in algorithm \ref{alg:aa1-prs}.
 
-
-
-
-%	\IncMargin{1em}
-\begin{algorithm}[H]
-\caption{AA-I with Powell-type regularisation and Restarting}\label{alg:aa1-pr-Hk}
-\SetKwInOut{Input}{Input}
-
-\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$, {\black$m \in\N$ }and $\bartheta{, \black\tau}\in(0,1)$}
-\BlankLine
-Set $H_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
-
-\For{$k=0,1,\dots$}{
-	Set $g_k= g(x_{k})$,
-	$m_k= m_{k-1}+1$, 
-	$s_{k-1}= x_k-x_{k-1}$ and
-	$y_{k-1}= g_k-g_{k-1}$.
-	
-	Set $\hs_{k-1}= s_{k-1}-\sum_{i=k-m_k}^{k-2}\frac{\hs_i^\top s_{k-1}}{\norm{\hs_i}^2}s_i$.
-	
-	\If{$m_k=m+1$ or $\norm{\hs_{k-1}}<\tau\norm{s_{k-1}}$}{
-		Set $m_k=0$, $\hs_{k-1}= s_{k-1}$ and $H_{k-1}=\Id$.
-	}
-	
-	Choose $\theta_{k-1}$ in dependence of $\bartheta$.
-	
-	Set $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$.
-	
-	{\black
-	Set $H_k = H_{k-1}+\frac{(s_{k-1}-H_{k-1}\tiy_{k-1})\hs_{k-1}^\top H_{k-1}}{\hs_{k-1}^\top H_{k-1}\tiy_{k-1}}$.
-	}
-	
-	Set $x_{k+1}= x_k-H_kg_k$.
-	
-}
-\end{algorithm}
-
-
-\subsection{Convergence: Safeguarding steps}
-
-
+The 
 To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnosel'skii-Mann (KM) steps which are given by
 \begin{align*}
 	x_{k+1}= (1-\alpha)x_k +\alpha f_k
 \end{align*}
 for some fixed $\alpha\in(0,1)$.
 
-
-\SetAlFnt{\scriptsize}
-
-
-%	\IncMargin{1em}
+\begin{figure}[h]
+\centering
 \begin{algorithm}[H]
 \caption{AA-I with Powell-type regularisation, restarting and safeguarding}\label{alg:aa1-prs}
 \SetKwInOut{Input}{Input}
 
-\Input{$x^0\in\R^n$, $f\colon\R^n\to\R^n$,$m \in\N$, $\bartheta, \tau, {\black\alpha}\in(0,1)$ and {\black safe-guarding constants $D,\e>0$}}
+\Input{$x_0\in\R^n$, $f\colon\R^n\to\R^n$,$m \in\N$, $\bartheta, \tau, {\black\alpha}\in(0,1)$ and {\black safe-guarding constants $D,\e>0$}}
 \BlankLine
-Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\black n_{AA}=0}$ and ${\black\barU=\norm{g_0}_2}$.
+Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\black n_{AA}=0}$ and ${\black\barU=\norm{g_0}}$.
 
 \For{$k=0,1,\dots$}{
 	Set $g_k= g(x_{k})$,
@@ -520,45 +315,21 @@ Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\black n_{AA}=0}$ and ${
 	}
 }
 \end{algorithm}
+\end{figure}
 
 
-\SetAlFnt{\normalsize}
-
+\newpage
 \section{Convergence result}
-
-
 
 \begin{theorem}[Convergence]
 	Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k$ converges to a fixed point of $f$.
 \end{theorem}
 
-
-%
-%	\tikzstyle{lemma} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
-%	\tikzstyle{arrow} = [thick,->,>=stealth]
-%	 
-%	\begin{tikzpicture}[node distance=2cm]
-%		\node (restartIteration) [lemma, text width=4cm] {Lemma (Restarting Iteration)};
-%		\node (Bk_welldefined) [lemma, below of=restartIteration] {$B_{k+1}$ well-defined};
-%		\node (Bk_invertible) [lemma, below of=Bk_welldefined] {$B_{k+1}$ invertible};
-%		\node (powell) [lemma, right of=restartIteration, xshift=4cm, text width=4cm] {Lemma (Powell-type regularisation)};
-%		\node (Hk_bound) [lemma, below of=powell] {Lemma(Bound of $H_k$)};
-%	\end{tikzpicture}
-%
-
-\begin{figure}
-\vspace*{1cm}
-\scalebox{0.9}{
-\input{../Figures/Diagram_002}
-}
-\end{figure}
-
 \begin{proof}
-
-The proof follows \cite[Theorem 6]{ZhaAA}. In the first part we use lemma ?? on the boundededness of $\norm{H_k}$ and the safe-guarding step to show the convergence of $g_k$ to $0$. In part 2 we also use lemma ?? and the safe-guarding to show convergence of $a_k=\norm{x_k-y}^2$ to some $a\in\R$. Here $y$ denotes a fixed point of $f$. In the third part we use parts 1 and 2 to show that $x_k$ converges to a fixed point.
+The proof follows \cite[Theorem 6]{ZhaAA}. In the first part we use lemma \ref{le:H_kUpperBound} on the boundededness of $\norm{H_k}_2$ and the safe-guarding step to show the convergence of $g_k$ to $0$. In part 2 we also use lemma \ref{le:H_kUpperBound} and the safe-guarding to show convergence of $a_k=\norm{x_k-y}^2$ to some $a\in\R$. Here $y$ denotes a fixed point of $f$. In the third part we use parts 1 and 2 to show that $x_k$ converges to a fixed point.
 
 \textit{Part 1.}
-We partition $\N=K_{AA}\sqcup K_{KM}$ where $K_{AA}=\brk[c]{m_0,m_1,\dots}$ denote the indices $k$ where the algorithm chose an AA-step (a) and $K_{KM}=\brk[c]{n_0,n_1,\dots}$ where the algorithm chose a KM-step (b).
+We partition $\N=K_{AA}\sqcup K_{KM}$ where $K_{AA}=\brk[c]{k_0,k_1,\dots}$ denote the indices $k$ where the algorithm chose an AA-step (a) and $K_{KM}=\brk[c]{l_0,l_1,\dots}$ where the algorithm chose a KM-step (b).
 
 \begin{center}
 \begin{algorithm}[H]
@@ -682,96 +453,8 @@ We thus have $x=\tix$. We have shown that two convergent subsequences of $x_k$ h
 \end{proof}
 
 
-
+\newpage
 \section{Numerical experiments}
-
-%\subsection{Regularised logistic regression}
-
-%
-%	
-%	We take $x\in\R^{2000\times 500}$, $y\in\R^{2000}$ from the UCI Madelon dataset \cite{MadDat}. The aim is to minimise
-%	\begin{align*}
-%		F(\theta) = \frac{1}{2000}\sum_{i}\log\brk{1+\sum_jy_ix_{ij}\theta_j}+\frac{\lambda}{2}\norm{\theta}^2
-%	\end{align*}
-%	with gradient descent, i.e.\
-%	\begin{align*}
-%		f\colon \R^{500}\to\R^{500}, \quad \theta\mapsto\theta-\alpha\nabla F(\theta)
-%	\end{align*}
-%	for some $\alpha$.
-%
-%
-%
-%	\begin{figure}
-%		\centering
-%		{\scriptsize
-%		\input{../Plots/method_comparison_GD.pgf}
-%		}
-%		\caption{Residual norms for the logistic regression problem.}
-%	\end{figure}
-%
-%
-%
-%	\begin{figure}
-%		\centering
-%		{\scriptsize
-%		\input{../Plots/memory_comparison_GD.pgf}
-%		}
-%		\caption{Residual norms for the logistic regression problem.}
-%	\end{figure}
-%
-%
-%\subsection{Facility location}
-%
-%
-%	
-%	The aim is to minimise
-%	\begin{align*}
-%		F\colon \R^{300}\to\R, \quad y\mapsto \sum_{i=1}^{500}\norm{y-c_i}
-%	\end{align*}
-%	for $c_i\in\R^{300}$ with sparsity $0.01$. This can lead to the formulation
-%	\begin{align*}
-%		\tilde{f}\colon \R^{500\times 300}\to\R^{500\times 300}, \quad
-%		z\mapsto \brk*{z_i+2\tikzmark{avg_x_dest}{\avg{x}}-\tikzmark{xi_dest}{x_i}-\avg{z}}_i
-%	\end{align*}
-%	with
-%	\begin{align*}
-%		\tikzmark{avg_x_source}{\avg{x}} = \frac{1}{500}\sum_ix_i \qquad \tikzmark{xi_source}{x_i} = \tikzmark{prox_dest}{\prox_{\norm{\cdot}}}\brk*{z_i+c_i}-c_i
-%	\end{align*}
-%	and
-%	\begin{align*}
-%		\tikzmark{prox_source}{\prox_{\norm{\cdot}}}(v) = \brk*{1-\frac{1}{\norm{v}}}_+v\,.
-%	\end{align*}
-%	\tikzset{external/export=false}
-%	\begin{tikzpicture}[remember picture, overlay, node distance = 0.5cm]
-%		\draw[,->,thick] (avg_x_source) to [in=-125,out=60] (avg_x_dest);
-%		\draw[,->,thick] (xi_source) to [in=-90,out=60] (xi_dest);
-%%		\draw[,->,thick] (prox_source) to [in=-90,out=60] (prox_dest);
-%	\end{tikzpicture}%
-%
-%
-%
-%
-%	\begin{figure}
-%		\centering
-%		{\scriptsize
-%		\input{../Plots/method_comparison_CO.pgf}
-%		}
-%		\caption{Residual norms for the facility location problem.}
-%	\end{figure}
-%
-%
-%
-%
-%	\begin{figure}
-%		\centering
-%		{\scriptsize
-%		\input{../Plots/memory_comparison_CO.pgf}
-%		}
-%		\caption{Residual norms for the facility location problem.}
-%	\end{figure}
-%
-
-
 
 As part of the project some numerical experiments from \cite{ZhaAA} were replicated. Thus the obtained results are the same as in \cite{ZhaAA}. The aim of the experiments is to test the numerical performance of the alorithms. For this $f$ is chosen so that the Lipshitz constant is close to $1$. This is precisely the type of problem for which the AA algorithm was developed.
 
@@ -785,7 +468,7 @@ with shrinkage operator
 \begin{align*}
 	S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_{i=1}^{n}
 \end{align*}
-and $A\in\R^{m\times n}$, $b\in\R^{m}$ and some $\alpha, \mu\in\R$. Here we choose the parameters as in \cite[Section 5.2]{ZhaAA}. In particular we choose $m=500$ and $n=1000$ and $A$, $b$ and $x^0$ to be randomly generated.
+and $A\in\R^{m\times n}$, $b\in\R^{m}$ and some $\alpha, \mu\in\R$. Here we choose the parameters as in \cite[Section 5.2]{ZhaAA}. In particular we choose $m=500$ and $n=1000$ and $A$, $b$ and $x_0$ to be randomly generated.
 
 \begin{figure}
 	\centering
@@ -796,7 +479,7 @@ and $A\in\R^{m\times n}$, $b\in\R^{m}$ and some $\alpha, \mu\in\R$. Here we choo
 	\label{pl:method_comparison_ISTA}
 \end{figure}
 
-The results for the different methods can be seen in Figure \ref{pl:method_comparison_ISTA}. Here the method 'original' is the fixed point iteration, i.e.\ algorithm ??. The method 'aa1-safe' is the AA-I algorithm with Powell-type regularisation, restarting and safeguarding. The 'aa2-matrix' algorithm is an implementation of the AA-II algorithm where 'matrix' indicates that the implementation is not matrix-free. We see little difference between the 'aa1' and the 'aa1-safe' methods. Both methods however outperform the 'original' and 'aa2-matrix' methods for this problem.
+The results for the different methods can be seen in Figure \ref{pl:method_comparison_ISTA}. Here the method 'original' is the fixed point iteration, i.e.\ algorithm \ref{alg:original}. The method 'aa1-safe' is the AA-I algorithm with Powell-type regularisation, restarting and safeguarding. The 'aa1-matrix' and 'aa2-matrix' algorithms are an implementation of the AA-I and AA-II algorithms given in \ref{alg:aa1} and \ref{alg:aa2} with limited memory. Here 'matrix' indicates that the implementation is not matrix-free. We see that the full-matrix implementations do not outperform the 'original' method and behave quite similar. The 'aa1' and 'aa1-safe' methods behave quite similar. Both methods however outperform the other methods for this problem.
 
 %\begin{figure}
 %	\centering
@@ -827,7 +510,7 @@ with some $R\in\R^{S\times A}$, $P\in\R^{S\times A\times A}$ and $\gamma\in\R$. 
 	\label{pl:method_comparison_VI}
 \end{figure}
 
-The performance for the various methods can be seen in figure \ref{pl:method_comparison_VI}. In contrast to the 'aa1-matrix' method the the 'aa2-matrix' method does not converge here. In this problem the fixed point iteration ('original') converges very slowly. The 'aa1-safe' method outperforms all others. This confirms numerically that the 'aa1-safe' algorithm can deal with the problems it was specifically designed for and for which the fixed point iteration fails. 
+The performance for the various methods can be seen in figure \ref{pl:method_comparison_VI}. In contrast to the other methods the the 'aa2-matrix' method does not converge here. In this problem the fixed point iteration ('original') converges very slowly. The 'aa1-safe' method outperforms all others. This confirms numerically that the 'aa1-safe' algorithm can deal with the problems it was specifically designed for and for which the fixed point iteration fails. 
 
 \begin{figure}
 	\centering

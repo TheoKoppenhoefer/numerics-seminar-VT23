@@ -49,11 +49,11 @@ if __name__ == '__main__':
     withms = [True, True, False]
 
     if True:
-        run_problems(problems[:-1], methods[1:], 'method_comparison', False)
-    if True:
+        run_problems(problems[2:3], methods, 'method_comparison', False)
+    if False:
         run_problems(problems[:-1], methods[2:3], 'memory_comparison', False, ms, len(problems)*[0.1], len(methods)*[True])
     if True:
-        run_problems(problems[-1:], methods, 'method_comparison', False, K_maxs=[100])
+        run_problems(problems[3:4], methods, 'method_comparison', False, K_maxs=[100])
     if True:
-        run_problems(problems[-1:], methods[2:3], 'memory_comparison', False, ms, withms=[True], K_maxs=[100])
+        run_problems(problems[3:4], methods[2:3], 'memory_comparison', False, ms, withms=[True], K_maxs=[100])
     
