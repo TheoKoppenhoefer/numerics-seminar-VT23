@@ -23,7 +23,7 @@
 \section{Introduction}
 
 The following report will summarise and present the main results of  \cite{ZhaAA} as part of the course NUMN27, Seminar in Numerical Analysis.
-First we will motivate the Anderson-acceleration-I (AA-I) algorithm.  Then we discuss the modifications made to the algorithm in \cite{ZhaAA}. After that we will give the main convergence result and finally test the AA-I algorithm in numerical experiments. The report, the python implementation and the corresponding presentation of the topic can be found online under \cite{Repository}.
+First we will motivate the Anderson-acceleration-I (AA-I) algorithm.  Then we discuss the modifications made to the algorithm in \cite{ZhaAA}. After that we will give the main convergence result and finally test the AA-I algorithm in numerical experiments. The report, the Python implementation and the corresponding presentation of the topic can be found online under \cite{Repository}.
 
 
 \begin{figure}
@@ -92,16 +92,17 @@ In science it is a common problem to find a fixed point $x=f(x)\in\R^n$ of a fun
 \begin{align*}
 	\norm{f(x)-f(y)}\leq\norm{x-y}\,.
 \end{align*}
-We however also assume that $\nabla f$ is unknown which means we cannot use Newton iteration to solve our problem. We assume that our problem is noisy so that we cannot take finite difference derivatives. If the cost of evaluating $f$ is very high then line search becomes unfeasible and if $n$ is very large we are forced to work matrix free. We know that this type of problem can nonetheless be solved by the fixed point iteration described in algorithm \ref{alg:original}.
+We however also assume that $\nabla f$ is unknown which means we cannot use Newton iteration to solve our problem. We assume that our problem is noisy so that we cannot take finite difference derivatives. If the cost of evaluating $f$ is very high, then line search becomes unfeasible and if $n$ is very large we are forced to work matrix free. We know that this type of problem can nonetheless be solved by the fixed point iteration described in algorithm \ref{alg:original}.
 
-It can be shown that the fixed point iteration will in this case converge to a fixed point of $f$. This convergence can be slow in practice if the Lipschitz-constant of $f$ is close to $1$. It is here were the Anderson-Acceleration (AA) methods come in.
+It can be shown that the fixed point iteration will in this case converge to a fixed point of $f$. This convergence is slow if the Lipschitz-constant of $f$ is close to $1$. It is here were the Anderson-Acceleration (AA) methods come in.
 
 The main idea of AA methods is to use the information gained from previous function evaluations of $f$ to determine the point $x_{k+1}$. To update $x_{k+1}$ we now form a weighted average as described in algorithm \ref{alg:aai}. For simplicity of notation we assume in the following that our memory is unlimited.
 
-The General AA algorithm requires a specific choice of $\alpha\in\R^{k+1}$. Since finding a fixed point of $f$ is equivalent to finding a zero of $f=\Id-f$ it seems sensible to require $\alpha$ to minimise
+The General AA algorithm requires a specific choice of $\alpha\in\R^{k+1}$. Since finding a fixed point of $f$ is equivalent to finding a zero of $g=\Id-f$ it seems sensible to require $\alpha$ to minimise
 \begin{align*}
-	\norm3{\sum_i\alpha_ig_i}\,.
+	\norm3{\sum_i\alpha_ig_i}
 \end{align*}
+under the condition that $\sum_i\alpha_i=1$.
 This choice of $\alpha$ yields the AA-II algorithm given in \ref{alg:aa2}.
 
 \begin{figure}
@@ -130,7 +131,7 @@ This choice of $\alpha$ yields the AA-II algorithm given in \ref{alg:aa2}.
 \end{algorithm}
 \end{figure}
 
-It is shown in \cite[Section 2.2]{ZhaAA} that this update can be brought into the form of a quasi-Newton-like method given in algorithm \ref{alg:aa2-ref}. This method bears a lot of similarities with the bad Broyden method where $H_k$ is an approximate inverse of $\nabla f(x_k)$. Indeed one can show
+It is shown in \cite[Section 2.2]{ZhaAA} that this update can be brought into the form of a quasi-Newton-like method given in algorithm \ref{alg:aa2-ref}. This method bears a lot of similarities with the bad Broyden method where $H_k$ is an approximate inverse of $\nabla f(x_k)$. Indeed one can show the following proposition.
 \begin{proposition}[Approximate inverse Jacobian]
 	In algorithm \ref{alg:aa2-ref} the matrix $H_k$ minimises $\norm{H_k-\Id}_F$ under the multi-secant condition $H_kS_k=Y_k$.
 \end{proposition}
@@ -170,7 +171,7 @@ Set $x_1=f(x_0)$
 \newpage
 \section{Modifications of the AA-I algorithm}
 
-The AA-I algorithm as stated in \ref{alg:aa1} has some issues. For one, the approach is not matrix-free. This is fixed by a rank-1 update formula for matrices $B_k$ and later for $H_k$. It may also occur in a step that the matrix $H_k$ is not well-defined. This may occur if $B_k$ itself is not well-defined or is singular. The well-definedness will be resolved by the Powell-type regularisation and the restarting of the iteration. The restarting of the iteration will also yield an algorithm that does not require unlimited memory. Lastly, this algorithm does not have the convergence property of the fixed point iteration algorithm. This will be resolved by adding a safeguarding of steps.
+The AA-I algorithm as stated in \ref{alg:aa1} has some issues. For one, the approach is not matrix-free. This is fixed by a rank-1 update formula for matrices $B_k$ and later for $H_k$. It may also occur in a step that the matrix $H_k$ is not well-defined. This may occur if $B_k$ itself is not well-defined or is singular. The well-definedness will be resolved by a Powell-type regularisation and the restarting of the iteration. The restarting of the iteration will also yield an algorithm that does not require unlimited memory. Lastly, this algorithm does not always converge when the fixed point iteration algorithm converges. This will be resolved by adding a safeguarding of steps.
 	
 	
 We start with the rank-1 update formula for $B_k$. One can show that
@@ -193,7 +194,7 @@ To fix the potential (approximate) singularity of $B_k$ we use Powell-type regul
 		B_{k} = B_{k-1}+\frac{\brk*{\tiy_{k-1}-B_{k-1}s_{k-1}}\hs_{k-1}^\top}{\hs_{k-1}^\top s_{k-1}}\,.
 \end{align*}
 Here $\tiy_{k-1}=\theta_{k-1}y_{k-1}-(1-\theta_{k-1})g_{k-1}$ where $\theta_{k-1}\in\R$ is chosen in dependence of a parameter $\bartheta$.
-This is a modification of the update of $B_k$ is given in algorithm \ref{alg:aa1-pr}.
+This modification of the update of $B_k$ is given in algorithm \ref{alg:aa1-pr}.
 
 If $\hs_k\approx 0$ the update of $B_k$ in ($*$) in algorithm \ref{alg:aa1-pr} becomes unstable and for $\hs_k=0$ ill-defined.
 Hence we restart the algorithm with $x_k$ as the new starting point if
@@ -213,7 +214,7 @@ It can be shown that $B_k$ is then well-defined.
 \BlankLine
 Set $B_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
 
-\For{$k=0,1,\dots$}{
+\For{$k=1,2,\dots$}{
 	Set $g_k= g(x_{k})$,
 	{\black $m_k= m_{k-1}+1$}, 
 	$s_{k-1}= x_k-x_{k-1}$ and
@@ -238,16 +239,16 @@ Set $B_0=\Id$, $x_1=f\brk{x_0}$ and {\black $m_0 = 0$}.
 \end{algorithm}
 \end{figure}
 
-One can then show
+One can then show the following Lemma.
 \newconstant{upperHk}
 \begin{lemma}[bound on $\norm{H_k}_2$]\label{le:H_kUpperBound}
-	In algorithm \ref{alg:aa1-pr} we have that $H_k$ is well-defined and there exists a constant $\useconstant{upperHk}=\useconstant{upperHk}(m,n, \bartheta,\tau)>0$ such that
+	In algorithm \ref{alg:aa1-pr} we have that $H_k$ is well-defined and there exists a constant $\useconstant{upperHk}>0$ which depends on $m$, $n$, $\bartheta$ and $\tau$ such that
 	\begin{align*}
 		\norm{H_k}_2\leq \useconstant{upperHk}\,.
 	\end{align*}
 \end{lemma}
 \begin{proof}
-	See \cite[Corollary 4]{ZhaAA} for details. An outline of the proof is given in figure \ref{fig:Diagram_001}. The proof uses two Lemmas which provide a bound of $\norm{B_k}$ from above and a bound of $\abs{\det B_k}$ from below.
+	See \cite[Corollary 4]{ZhaAA} for details. An outline of the proof is given in Figure \ref{fig:Diagram_001}. The proof uses two lemmas which provide a bound of $\norm{B_k}$ from above and a bound of $\abs{\det B_k}$ from below.
 	
 	\begin{figure}
 	\centering
@@ -260,7 +261,7 @@ One can then show
 %	\tikzexternalenable
 	\end{figure}
 \end{proof}
-This bound on $\norm{H_k}_2$ will later be used when showing convergence of the final algorithm. One can now replace the update formula for the $B_k$ directly with an update formula for $H_k$ by the following result.
+This bound on $\norm{H_k}_2$ will later be used when showing convergence of the final algorithm. One can now replace the update formula for $B_k$ with an update formula for $H_k$ by the following result.
 \begin{proposition}[Rank-1 update for $H_k$]
 	We have
 	\begin{align*}
@@ -268,7 +269,7 @@ This bound on $\norm{H_k}_2$ will later be used when showing convergence of the 
 	\end{align*}
 \end{proposition}
 This formula has been incorporated in algorithm \ref{alg:aa1-prs}.
-Note that the convergence behaviour of the algorithm \ref{alg:aa1-pr} is not optimal.
+Note that the convergence behaviour of algorithm \ref{alg:aa1-pr} is not optimal.
 To guarantee the decrease in $\norm{g_k}$ one can interleave the AA-I steps with Krasnosel'skii-Mann (KM) steps which are given by
 \begin{align*}
 	x_{k+1}= (1-\alpha)x_k +\alpha f_k
@@ -285,7 +286,7 @@ for some fixed $\alpha\in(0,1)$. This yields the final algorithm \ref{alg:aa1-pr
 \BlankLine
 Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\black n_{AA}=0}$ and ${\black\barU=\norm{g_0}}$.
 
-\For{$k=0,1,\dots$}{
+\For{$k=1,2,\dots$}{
 	Set $g_k= g(x_{k})$,
 	$m_k= m_{k-1}+1$, 
 	$s_{k-1}= {\black\tix_k}-x_{k-1}$ and
@@ -324,7 +325,7 @@ Set $H_0=\Id$, $x_1={\black\tix_1=f\brk{x_0}}$, $m_0 = {\black n_{AA}=0}$ and ${
 In this section we state and prove the main convergence result in three parts.
 
 \begin{theorem}[Convergence]
-	Let $x_k$ be generated by algorithm \ref{alg:aa1-prs} then $x_k$ converges to a fixed point of $f$.
+	Let $x_k$ be generated by algorithm \ref{alg:aa1-prs}, then $x_k$ converges to a fixed point of $f$.
 \end{theorem}
 
 \begin{proof}
@@ -360,7 +361,7 @@ Let $y$ be a fixed point of $f$. We distinguish the cases
 	\end{equation}
 	for some constant $\useconstant{CDU}>0$.
 	\item[case (b)]
-	if $l_i\in K_{KM}$ then one can show (see \cite[Theorem 6]{ZhaAA})
+	if $l_i\in K_{KM}$ then one can show that (see \cite[Theorem 6]{ZhaAA})
 	\begin{align}
 		\norm{x_{l_i+1}-y}^2\leq \norm{x_{l_i}-y}^2-\alpha(1-\alpha)\norm{g_{l_i}}^2
 		\label{eq:17}\,.
@@ -465,11 +466,11 @@ In the first experiment $f$ originates from an elastic net regression problem an
 \begin{align*}
 	f\colon\R^{n}\to\R^{n}, \qquad x\mapsto S_{\alpha\mu/2}\brk*{x-\alpha\brk*{A^\top(Ax-b)+\frac{\mu}{2}x}}
 \end{align*}
-with shrinkage operator
+with the shrinkage operator
 \begin{align*}
 	S_\kappa(x) = \brk*{\sgn(x_i)\brk*{\abs{x_i}-\kappa}_+}_{i=1}^{n}
 \end{align*}
-and $A\in\R^{m\times n}$, $b\in\R^{m}$ and some $\alpha, \mu\in\R$. Here we choose the parameters as in \cite[Section 5.2]{ZhaAA}. In particular we choose $m=500$ and $n=1000$ and $A$, $b$ and $x_0$ to be randomly generated.
+and $A\in\R^{m\times n}$, $b\in\R^{m}$ and some $\alpha, \mu\in\R$. Here we choose the parameters as in \cite[Section 5.2]{ZhaAA}, namely $m=500$ and $n=1000$ and $A$, $b$ and $x_0$ to be randomly generated.
 
 \begin{figure}
 	\centering
@@ -480,7 +481,7 @@ and $A\in\R^{m\times n}$, $b\in\R^{m}$ and some $\alpha, \mu\in\R$. Here we choo
 	\label{pl:method_comparison_ISTA}
 \end{figure}
 
-The results for the different methods can be seen in Figure \ref{pl:method_comparison_ISTA}. Here the method 'original' refers to the fixed point iteration, i.e.\ algorithm \ref{alg:original}. The method 'aa1-safe' is the AA-I algorithm with Powell-type regularisation, restarting and safeguarding. The 'aa1-matrix' and 'aa2-matrix' algorithms are an implementation of the AA-I and AA-II algorithms given in \ref{alg:aa1} and \ref{alg:aa2} with limited memory. Here 'matrix' indicates that the implementation is not matrix-free. We see that the full-matrix implementations do not outperform the 'original' method and behave quite similarly. The 'aa1' and 'aa1-safe' methods behave quite similarly. Both methods however outperform the other methods on this problem.
+The results for the different methods can be seen in Figure \ref{pl:method_comparison_ISTA}. Here the method `original' refers to the fixed point iteration, i.e.\ algorithm \ref{alg:original}. The method `aa1-safe' is the AA-I algorithm with Powell-type regularisation, restarting and safeguarding. The `aa1-matrix' and `aa2-matrix' algorithms are an implementation of the AA-I and AA-II algorithms given in \ref{alg:aa1} and \ref{alg:aa2} with limited memory. Here `matrix' indicates that the implementation is not matrix-free. We see that the full-matrix implementations do not outperform the `original' method and behave quite similarly. The `aa1' and `aa1-safe' methods behave quite similarly. Both methods however outperform the other methods on this problem.
 
 %\begin{figure}
 %	\centering
@@ -500,7 +501,7 @@ In a second experiment $f$ originates from a random Markov decision process whic
 \begin{align*}
 	f\colon\R^{n}\to\R^{n}, \qquad x\mapsto \brk*{\max_{a} \brk3{ R_{sa}+\gamma \sum_{s'}P_{sas'}x_{s'}}}_{s=1}^{n}
 \end{align*}
-with some $R\in\R^{S\times A}$, $P\in\R^{S\times A\times A}$ and $\gamma\in\R$. Here the parameter $\gamma$ determines the Lipschitz-constant of $f$. Again, we choose the parameters as in \cite[Section 5.2]{ZhaAA}. In particular we choose $n=1000$, $A=200$, $S=300$ and $A$ and $R$ to be randomly generated.
+with some $R\in\R^{S\times A}$, $P\in\R^{S\times A\times A}$ and $\gamma\in\R$. Here the parameter $\gamma$ determines the Lipschitz-constant of $f$. Again, we choose the parameters as in \cite[Section 5.2]{ZhaAA}, namely $n=1000$, $A=200$, $S=300$ and $A$ and $R$ to be randomly generated.
 
 \begin{figure}
 	\centering
@@ -511,7 +512,7 @@ with some $R\in\R^{S\times A}$, $P\in\R^{S\times A\times A}$ and $\gamma\in\R$. 
 	\label{pl:method_comparison_VI}
 \end{figure}
 
-The performance for the various methods can be seen in figure \ref{pl:method_comparison_VI}. In contrast to the other methods the the 'aa2-matrix' method does not converge here. In this problem the fixed point iteration ('original') converges very slowly. The 'aa1-safe' method outperforms all others. This confirms numerically that the 'aa1-safe' algorithm can deal with the problems it was specifically designed for and for which the fixed point iteration fails to converge in adequate time. 
+The performance for the various methods can be seen in Figure \ref{pl:method_comparison_VI}. In contrast to the other methods the `aa2-matrix' method does not converge here. In this problem the fixed point iteration (`original') converges very slowly. The `aa1-safe' method outperforms all others. This confirms numerically that the `aa1-safe' algorithm can deal with the problems it was specifically designed for and for which the fixed point iteration fails to converge in adequate time. 
 
 \begin{figure}
 	\centering
@@ -523,13 +524,13 @@ The performance for the various methods can be seen in figure \ref{pl:method_com
 	\label{pl:memory_comparison_VI}
 \end{figure}
 
-In figure \ref{pl:memory_comparison_VI}  we see how the performance of the 'aa1-safe' method depends on the memory parameter $m$. In particular one sees that the algorithm performs best for this problem with a parameter of $m\approx10$. We also see that increasing the parameter $m$ does not necessarily improve performance of the method as in this plot the choice $m=50$ performs worst.
+In Figure \ref{pl:memory_comparison_VI}  we see how the performance of the `aa1-safe' method depends on the memory parameter $m$. In particular one sees that the algorithm performs best for this problem with a parameter of $m\approx10$. We also see that increasing the parameter $m$ does not necessarily improve performance of the method as in this plot the choice $m=50$ performs worst.
 
 \newpage
 
 \section{Summary}
 
-The AA-I algorithm is specifically tailored to find the fixed point of a function $f$ which is expensive to evaluate, noisy, has an unknown gradient and where the dimension $n$ is large. The main idea of the AA-I and AA-II algorithms is to generalise the fixed point iteration by setting $x_{k+1}=\sum_i\alpha_if_i$ for some clever choice of $\alpha=\alpha^k\in\R^{k+1}$. The AA-I algorithm one obtains requires some modifications. More specifically, one applies Powell-type regularisation and a restarting of the iteration for well-definedness. One builds in a mechanism for safeguarding of the steps for convergence and one uses a rank-1 update formula to make the implementation matrix-free. One can then show the convergence of the algorithm under the assumption that $f$ is non-expansive and that there exists a fixed point. The numerical experiments then show that the AA-I algorithm with the modifications outperforms the fixed point iteration for the problems tested.
+The AA-I algorithm is specifically tailored to find the fixed point of a function $f$ which is expensive to evaluate, noisy, has an unknown gradient and where the dimension $n$ is large. The main idea of the AA-I and AA-II algorithms is to generalise the fixed point iteration by setting $x_{k+1}=\sum_i\alpha_if_i$ for some clever choice of $\alpha=\alpha^k\in\R^{k+1}$. The AA-I algorithm one obtains requires some modifications. More specifically, one applies Powell-type regularisation and a restarting of the iteration for well-definedness. One builds in a mechanism for safeguarding of the steps for convergence and one uses a rank-1 update formula to make the implementation matrix-free. One can then show convergence of the algorithm under the assumption that $f$ is non-expansive and that there exists a fixed point. The numerical experiments then show that the AA-I algorithm with the modifications outperforms the fixed point iteration for the problems tested.
 
 
 
